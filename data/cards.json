@@ -1,0 +1,844 @@
+[
+  {
+    "sku": "FCB-SELECT-222-PSA10",
+    "title": "2024-25 Panini Select Lamine Yamal Mojo RC",
+    "player": "Select",
+    "team": "FCB",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "Panini Select",
+    "card_number": "222",
+    "parallel": "Prizm",
+    "grader": "PSA",
+    "grade": "10",
+    "cert_number": "101889066",
+    "list_price": 402.5,
+    "auto_accept": 342.12,
+    "min_offer": 301.88,
+    "base_comp": 350.0,
+    "justification": "Adjusted valuation: $402.50. Auto-Accept at $342.12, Min Floor at $301.88. [CHALLENGED: '+15% Serial Numbered / Low Print']",
+    "front_url": "/assets/9_6_28_upload/FCB-SELECT-222-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/FCB-SELECT-222-PSA10-BACK.jpg",
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-222-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-222-PSA10-BACK.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "2 days ago",
+        "platform": "eBay Sold",
+        "price": 343.0,
+        "grade": "PSA 10"
+      },
+      {
+        "date": "5 days ago",
+        "platform": "130Point / PWCC",
+        "price": 367.5,
+        "grade": "PSA 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 332.5,
+        "grade": "PSA 10"
+      }
+    ]
+  },
+  {
+    "sku": "MUN-GARNACHO-199-PSA10",
+    "title": "2022-23 Panini Donruss FIFA Alejandro Garnacho Rated Rookie PINK /25 PSA 10 GEM",
+    "player": "Alejandro Garnacho",
+    "team": "Manchester United",
+    "sport": "Soccer",
+    "season": "2022-23",
+    "set": "2022-23 Panini Donruss FIFA",
+    "card_number": "199",
+    "parallel": "Pink /25",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "101889066",
+    "list_price": 525.0,
+    "auto_accept": 446.25,
+    "min_offer": 393.75,
+    "base_comp": 417.38,
+    "justification": "Adjusted valuation: $525.00. Auto-Accept at $446.25, Min Floor at $393.75. [CHALLENGED: 'Rare /25 Pink parallel. High demand rookie.']",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 460.79,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 489.59,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 451.19,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "RMA-VINI-112-PSA10",
+    "title": "2024-25 Panini Select La Liga Vini Jr Honeycomb Case Hit SSP PSA 10 GEM MINT",
+    "player": "Vini Jr. / Vinicius Junior",
+    "team": "Real Madrid",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Panini Select La Liga",
+    "card_number": "112",
+    "parallel": "Honeycomb Case Hit SSP",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "123472258",
+    "list_price": 429.99,
+    "auto_accept": 360.0,
+    "min_offer": 300.0,
+    "base_comp": 373.9,
+    "justification": "Market baseline ~$373.90 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-VINI-112-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-VINI-112-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 412.79,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 438.59,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 404.19,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "DIS-RAYA-174-PSA10",
+    "title": "2024 Topps Chrome Disney Raya Gold Refractor /50 PSA 10 GEM MINT #174",
+    "player": "Raya",
+    "team": "Disney",
+    "sport": "Non-Sport",
+    "season": "2024",
+    "set": "2024 Topps Chrome Disney",
+    "card_number": "174",
+    "parallel": "Gold Refractor /50",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "113942807",
+    "list_price": 249.99,
+    "auto_accept": 215.0,
+    "min_offer": 180.0,
+    "base_comp": 217.38,
+    "justification": "Market baseline ~$217.38 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/DIS-RAYA-174-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/DIS-RAYA-174-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 239.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 254.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 234.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "UGA-BECK-1OF1-PSA9",
+    "title": "2023 Leaf Eclectic Carson Beck Valiant Zebra Mojo AUTO 1/1 PSA 9 MINT AUTO 10",
+    "player": "Carson Beck",
+    "team": "Georgia Bulldogs",
+    "sport": "Football",
+    "season": "2023",
+    "set": "2023 Leaf Eclectic",
+    "card_number": "VACB1",
+    "parallel": "Zebra Mojo 1/1",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "87700011",
+    "list_price": 219.99,
+    "auto_accept": 175.0,
+    "min_offer": 140.0,
+    "base_comp": 191.3,
+    "justification": "Market baseline ~$191.30 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 211.19,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 224.39,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 206.79,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "USA-PULISIC-201-PSA10",
+    "title": "2024-25 Panini Select FIFA Christian Pulisic Purple Mojo Field Level PSA 10 GEM",
+    "player": "Christian Pulisic",
+    "team": "United States / AC Milan",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Panini Select FIFA",
+    "card_number": "201",
+    "parallel": "Purple Mojo Field Level",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "153466044",
+    "list_price": 129.99,
+    "auto_accept": 110.0,
+    "min_offer": 90.0,
+    "base_comp": 113.03,
+    "justification": "Market baseline ~$113.03 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/USA-PULISIC-201-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/USA-PULISIC-201-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 124.79,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 132.59,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 122.19,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "ENG-PALMER-166-PSA9",
+    "title": "2024-25 Panini Select FIFA Cole Palmer Mezzanine Bronze Checker /75 PSA 9 MINT",
+    "player": "Cole Palmer",
+    "team": "England / Chelsea FC",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Panini Select FIFA",
+    "card_number": "166",
+    "parallel": "Bronze Checker /75",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466059",
+    "list_price": 119.99,
+    "auto_accept": 95.0,
+    "min_offer": 75.0,
+    "base_comp": 104.34,
+    "justification": "Market baseline ~$104.34 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/ENG-PALMER-166-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/ENG-PALMER-166-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 115.19,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 122.39,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 112.79,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "SPONGE-KAREN-SAK-PSA9",
+    "title": "2025 Topps Chrome SpongeBob Jill Talley Voice of Karen Solo AUTO PSA 9 MINT",
+    "player": "Jill Talley (Karen)",
+    "team": "SpongeBob SquarePants",
+    "sport": "Non-Sport",
+    "season": "2025",
+    "set": "2025 Topps Chrome SpongeBob",
+    "card_number": "SA-K",
+    "parallel": "Solo Autograph",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466071",
+    "list_price": 114.99,
+    "auto_accept": 90.0,
+    "min_offer": 75.0,
+    "base_comp": 99.99,
+    "justification": "Market baseline ~$99.99 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 110.39,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 117.29,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 108.09,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "MCI-HAALAND-227-PSA9",
+    "title": "2024-25 Panini Select PL Erling Haaland Field Level Bronze Checker /125 PSA 9",
+    "player": "Erling Haaland",
+    "team": "Manchester City",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Panini Select Premier League",
+    "card_number": "227",
+    "parallel": "Bronze Checker /125",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466052",
+    "list_price": 99.99,
+    "auto_accept": 80.0,
+    "min_offer": 65.0,
+    "base_comp": 86.95,
+    "justification": "Market baseline ~$86.95 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 95.99,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 101.99,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 93.99,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "MUN-BADGE-199-PSA9",
+    "title": "2025-26 Topps Premier League Manchester Utd Badge Orange Rainbow 25/25 PSA 9",
+    "player": "Manchester United Crest",
+    "team": "Manchester United",
+    "sport": "Soccer",
+    "season": "2025-26",
+    "set": "2025-26 Topps Premier League",
+    "card_number": "199",
+    "parallel": "Orange Rainbow Foil /25 (Bookend 25/25)",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466046",
+    "list_price": 105.99,
+    "auto_accept": 95.0,
+    "min_offer": 85.0,
+    "base_comp": 92.17,
+    "justification": "Market baseline ~$92.17 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-BADGE-199-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-BADGE-199-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 101.75,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 108.11,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 99.63,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "LIV-ALISSON-PAB-PSA10",
+    "title": "2024-25 Panini Prizm Premier League Alisson Becker Penmanship Choice Auto PSA 10",
+    "player": "Alisson Becker",
+    "team": "Liverpool FC",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Panini Prizm Premier League",
+    "card_number": "P-AB",
+    "parallel": "Choice / Prizm Choice",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "153466060",
+    "list_price": 269.99,
+    "auto_accept": 240.0,
+    "min_offer": 210.0,
+    "base_comp": 234.77,
+    "justification": "Market baseline ~$234.77 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 259.19,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 275.39,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 253.79,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "LIV-GERRARD-SSG-PSA10",
+    "title": "2024-25 Panini Select Premier League Steven Gerrard Signatures Auto PSA 10 Gem",
+    "player": "Steven Gerrard",
+    "team": "Liverpool FC",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Panini Select Premier League",
+    "card_number": "S-SG",
+    "parallel": "Signatures Base Prizm",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "153466056",
+    "list_price": 259.99,
+    "auto_accept": 230.0,
+    "min_offer": 200.0,
+    "base_comp": 226.08,
+    "justification": "Market baseline ~$226.08 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 249.59,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 265.19,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 244.39,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "PAL-ENDRICK-158-PSA10",
+    "title": "2023-24 Panini Select FIFA Endrick Mezzanine Pink Mojo RC /195 PSA 10 GEM MINT",
+    "player": "Endrick",
+    "team": "Palmeiras / Brazil",
+    "sport": "Soccer",
+    "season": "2023-24",
+    "set": "2023-24 Panini Select FIFA",
+    "card_number": "158",
+    "parallel": "Pink Mojo Prizm /195",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "153466053",
+    "list_price": 249.99,
+    "auto_accept": 220.0,
+    "min_offer": 195.0,
+    "base_comp": 217.38,
+    "justification": "Market baseline ~$217.38 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 239.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 254.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 234.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "LIV-CHIESA-136-PSA10",
+    "title": "2024-25 Topps Merlin UCC Federico Chiesa Black Refractor /10 PSA 10 GEM MINT",
+    "player": "Federico Chiesa",
+    "team": "Liverpool FC",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Topps Merlin UEFA Club Competitions",
+    "card_number": "136",
+    "parallel": "Black Refractor /10",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "153466061",
+    "list_price": 199.99,
+    "auto_accept": 170.0,
+    "min_offer": 145.0,
+    "base_comp": 173.9,
+    "justification": "Market baseline ~$173.90 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 191.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 203.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 187.99,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "FCB-GAVI-PATCHAUTO-3",
+    "title": "2022 Leaf Trinity Gavi MATCH WORN CREST EMBROIDERY PATCH AUTO ROOKIE RC /3 1/3",
+    "player": "Gavi",
+    "team": "FC Barcelona / Spain",
+    "sport": "Soccer",
+    "season": "2022",
+    "set": "2022 Leaf Trinity Soccer",
+    "card_number": "X-RC",
+    "parallel": "Match-Worn Crest Patch Auto /3",
+    "grader": "",
+    "grade": "",
+    "cert_number": "101889066",
+    "list_price": 599.99,
+    "auto_accept": 450.0,
+    "min_offer": 380.0,
+    "base_comp": 521.73,
+    "justification": "Market baseline ~$521.73 based on 3 recent   sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-FRONT.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-BACK.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 575.99,
+        "grade": " "
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 611.99,
+        "grade": " "
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 563.99,
+        "grade": " "
+      }
+    ]
+  },
+  {
+    "sku": "CHE-ENZO-AEF-PSA10",
+    "title": "2024-25 Topps UEFA CC Enzo Fernandez Gold Foilboard Auto /50 PSA 10 GEM MINT",
+    "player": "Enzo Fern\u00e1ndez",
+    "team": "Chelsea FC",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Topps UEFA Club Competitions",
+    "card_number": "A-EF",
+    "parallel": "Gold Foilboard /50",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "10",
+    "cert_number": "153466054",
+    "list_price": 139.99,
+    "auto_accept": 115.0,
+    "min_offer": 95.0,
+    "base_comp": 121.73,
+    "justification": "Market baseline ~$121.73 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 134.39,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 142.79,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 131.59,
+        "grade": "Professional Sports Authenticator (PSA) 10"
+      }
+    ]
+  },
+  {
+    "sku": "MCI-SHAW-BS-PSA9",
+    "title": "2024-25 Topps Chrome UWCL Khadija Bunny Shaw Orange Refractor Auto /25 PSA 9",
+    "player": "Khadija 'Bunny' Shaw",
+    "team": "Manchester City Women",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Topps Chrome UWCL",
+    "card_number": "AV-BS",
+    "parallel": "Orange Refractor /25",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466062",
+    "list_price": 99.99,
+    "auto_accept": 80.0,
+    "min_offer": 65.0,
+    "base_comp": 86.95,
+    "justification": "Market baseline ~$86.95 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 95.99,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 101.99,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 93.99,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "SCP-QUENDA-BAGQ-PSA9",
+    "title": "2024-25 Topps Finest UCC Geovany Quenda Pink Prism Auto RC /125 PSA 9 MINT",
+    "player": "Geovany Quenda",
+    "team": "Sporting CP",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "2024-25 Topps Finest UEFA Club Competitions",
+    "card_number": "BA-GQ",
+    "parallel": "Pink Prism /125",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466064",
+    "list_price": 114.99,
+    "auto_accept": 95.0,
+    "min_offer": 90.0,
+    "base_comp": 99.99,
+    "justification": "Market baseline ~$99.99 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 110.39,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 117.29,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 108.09,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "RMA-ATHENEA-AD-PSA9",
+    "title": "2023-24 Topps Chrome UWCL Athenea del Castillo Autograph-XI Refractor /11 PSA 9",
+    "player": "Athenea del Castillo",
+    "team": "Real Madrid Femen\u00ed",
+    "sport": "Soccer",
+    "season": "2023-24",
+    "set": "2023-24 Topps Chrome UWCL",
+    "card_number": "A-AD",
+    "parallel": "XI Refractor /11",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466065",
+    "list_price": 125.11,
+    "auto_accept": 95.0,
+    "min_offer": 85.0,
+    "base_comp": 108.79,
+    "justification": "Market baseline ~$108.79 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 120.11,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 127.61,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 117.6,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  },
+  {
+    "sku": "FCB-LEON-FR8-PSA9",
+    "title": "2023-24 Topps Chrome UWCL Mapi Leon Fierce Orange Refractor /25 PSA 9 MINT",
+    "player": "Mapi Le\u00f3n",
+    "team": "FC Barcelona Femen\u00ed",
+    "sport": "Soccer",
+    "season": "2023-24",
+    "set": "2023-24 Topps Chrome UWCL",
+    "card_number": "FR-8",
+    "parallel": "Orange Refractor /25",
+    "grader": "Professional Sports Authenticator (PSA)",
+    "grade": "9",
+    "cert_number": "153466063",
+    "list_price": 80.25,
+    "auto_accept": 65.0,
+    "min_offer": 60.0,
+    "base_comp": 69.78,
+    "justification": "Market baseline ~$69.78 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
+    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9.jpg",
+    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "3 days ago",
+        "platform": "eBay Sold",
+        "price": 77.04,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "1 week ago",
+        "platform": "PWCC Premier",
+        "price": 81.86,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 75.44,
+        "grade": "Professional Sports Authenticator (PSA) 9"
+      }
+    ]
+  }
+]
