@@ -297,6 +297,16 @@ app.add_middleware(
 )
 
 @app.middleware("http")
+async def restore_vercel_path(request, call_next):
+    orig = request.query_params.get("__original_path")
+    if orig:
+        clean_path = orig.split("?")[0]
+        request.scope["path"] = clean_path
+    response = await call_next(request)
+    return response
+
+
+@app.middleware("http")
 async def add_no_cache_headers(request, call_next):
     response = await call_next(request)
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
