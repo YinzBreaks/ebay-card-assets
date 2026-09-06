@@ -313,7 +313,8 @@ async def custom_404_handler(request, exc):
             "error": "Not Found",
             "request_path": request.url.path,
             "scope_path": request.scope.get("path"),
-            "scope_root_path": request.scope.get("root_path")
+            "scope_root_path": request.scope.get("root_path"),
+            "headers": dict(request.headers)
         }
     )
 
