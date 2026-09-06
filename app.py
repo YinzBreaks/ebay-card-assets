@@ -820,6 +820,11 @@ def get_index():
     return JSONResponse({"status": "CardFlow API Online"})
 
 
+@app.get("/api")
+def get_api_root():
+    return JSONResponse({"status": "ok", "message": "CardFlow API Running"})
+
+
 @app.get("/style.css")
 def get_css():
     for p in [os.path.join(APP_DIR, "style.css"), os.path.join(WEB_DIR, "style.css")]:
