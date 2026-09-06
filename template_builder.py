@@ -67,7 +67,9 @@ def build_template_with_excel_com(csv_file="ebay_upload.csv",
                                   default_returns="Returns - (ID: 255419358020)",
                                   default_payments="Payment Policy - (ID: 255419355020)",
                                   location="Bethlehem PA",
-                                  default_photo=""):
+                                  default_photo="",
+                                  image_dir=None,
+                                  image_base_url=None):
     abs_csv = os.path.abspath(csv_file)
     abs_template = os.path.abspath(template_file)
     abs_output_xlsx = os.path.abspath(output_xlsx)
@@ -218,6 +220,15 @@ def build_template_with_excel_com(csv_file="ebay_upload.csv",
 
             # Photo URL
             photo_url = str(row.get('Item photo URL', row.get('PicURL', row.get('Photo URL', row.get('Image URL', row.get('Photo', ''))))) or '').strip()
+            if not photo_url and image_dir and image_base_url and os.path.isdir(image_dir):
+                files = os.listdir(image_dir)
+                matched = sorted([f for f in files if f.startswith(sku)])
+                front_photos = [f for f in matched if 'FRONT' in f.upper()]
+                back_photos = [f for f in matched if 'BACK' in f.upper()]
+                other_photos = [f for f in matched if f not in front_photos and f not in back_photos]
+                ordered = front_photos + back_photos + other_photos if (front_photos or back_photos) else matched
+                if ordered:
+                    photo_url = '|'.join([f"{image_base_url.rstrip('/')}/{f}" for f in ordered])
             if not photo_url and default_photo:
                 photo_url = default_photo
             if c_photo and photo_url:
@@ -386,6 +397,8 @@ if __name__ == '__main__':
     parser.add_argument('--payments', default='Payment Policy - (ID: 255419355020)', help='Payment Policy Name')
     parser.add_argument('--location', default='Bethlehem PA', help='Item Location')
     parser.add_argument('--photo-url', default='', help='Default or placeholder photo URL (must start with https:// and end with .jpg/.png)')
+    parser.add_argument('--image-dir', default=r'assets\9_6_28_upload', help='Directory containing listing images named by SKU')
+    parser.add_argument('--image-base-url', default='https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload', help='Public base URL where images are hosted')
 
     args = parser.parse_args()
 
@@ -398,5 +411,7 @@ if __name__ == '__main__':
         default_returns=args.returns,
         default_payments=args.payments,
         location=args.location,
-        default_photo=args.photo_url
+        default_photo=args.photo_url,
+        image_dir=args.image_dir,
+        image_base_url=args.image_base_url
     )
