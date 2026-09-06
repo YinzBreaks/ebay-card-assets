@@ -297,36 +297,12 @@ app.add_middleware(
 )
 
 @app.middleware("http")
-async def restore_vercel_path(request, call_next):
-    orig = request.query_params.get("__original_path")
-    if orig:
-        clean_path = orig.split("?")[0]
-        request.scope["path"] = clean_path
-    response = await call_next(request)
-    return response
-
-
-@app.middleware("http")
 async def add_no_cache_headers(request, call_next):
     response = await call_next(request)
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-
-
-@app.exception_handler(404)
-async def custom_404_handler(request, exc):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "error": "Not Found",
-            "request_path": request.url.path,
-            "scope_path": request.scope.get("path"),
-            "scope_root_path": request.scope.get("root_path"),
-            "headers": dict(request.headers)
-        }
-    )
 
 
 class ChallengeRequest(BaseModel):
