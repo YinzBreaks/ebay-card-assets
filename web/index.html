@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=2">
+  <link rel="stylesheet" href="/style.css?v=3">
 </head>
 <body>
   <div class="app-layout">
@@ -183,10 +183,34 @@
 
   <!-- INSPECT & CHALLENGE COMP MODAL -->
   <div class="modal-backdrop" id="challengeModal">
+    <!-- Floating Backdrop Navigation Buttons -->
+    <button class="floating-nav-btn floating-prev" id="floatingPrevCardBtn" title="Previous Record (← key)">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button class="floating-nav-btn floating-next" id="floatingNextCardBtn" title="Next Record (→ key)">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+
     <div class="modal-drawer">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <span class="badge-tag">INSPECT & CHALLENGE</span>
+          <div class="modal-tag-row">
+            <span class="badge-tag">INSPECT & CHALLENGE</span>
+            <div class="modal-nav-controls">
+              <button class="nav-arrow-btn" id="modalPrevCardBtn" title="Previous Record (← key)">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <span class="nav-counter-pill" id="modalNavCounter">Card 1 of 18</span>
+              <button class="nav-arrow-btn" id="modalNextCardBtn" title="Next Record (→ key)">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+              </button>
+              <span class="keyboard-nav-hint"><kbd>←</kbd> <kbd>→</kbd></span>
+            </div>
+          </div>
           <h2 id="modalCardTitle">2022-23 Panini Donruss FIFA Alejandro Garnacho</h2>
         </div>
         <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -403,6 +427,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=2"></script>
+  <script src="/app.js?v=3"></script>
 </body>
 </html>

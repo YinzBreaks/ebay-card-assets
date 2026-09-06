@@ -39,6 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Challenge Modal Elements
   const challengeModal = document.getElementById("challengeModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
+  const modalPrevCardBtn = document.getElementById("modalPrevCardBtn");
+  const modalNextCardBtn = document.getElementById("modalNextCardBtn");
+  const modalNavCounter = document.getElementById("modalNavCounter");
+  const floatingPrevCardBtn = document.getElementById("floatingPrevCardBtn");
+  const floatingNextCardBtn = document.getElementById("floatingNextCardBtn");
   const modalFlipCard = document.getElementById("modalFlipCard");
   const flipToggleBtn = document.getElementById("flipToggleBtn");
   const modalFrontImg = document.getElementById("modalFrontImg");
@@ -317,6 +322,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reset 3D flip state
     modalFlipCard.classList.remove("flipped");
 
+    // Update navigation counter
+    const filtered = getFilteredCards();
+    const currentIdx = filtered.findIndex(c => c.sku === card.sku);
+    if (modalNavCounter) {
+      const displayIdx = currentIdx >= 0 ? currentIdx + 1 : 1;
+      modalNavCounter.textContent = `Card ${displayIdx} of ${filtered.length}`;
+    }
+
     modalJustificationText.textContent = card.justification || "Market comps verified from recent historical sales.";
 
     modalListPrice.value = parseFloat(card.list_price || 0).toFixed(2);
@@ -350,6 +363,64 @@ document.addEventListener("DOMContentLoaded", () => {
     challengeModal.classList.remove("open");
     currentCard = null;
   }
+
+  function navigateCard(direction) {
+    const filtered = getFilteredCards();
+    if (!filtered || filtered.length === 0) return;
+    if (!currentCard) {
+      openChallengeModal(filtered[0]);
+      return;
+    }
+
+    const currentIndex = filtered.findIndex(c => c.sku === currentCard.sku);
+    let newIndex = 0;
+    if (currentIndex !== -1) {
+      newIndex = (currentIndex + direction + filtered.length) % filtered.length;
+    } else {
+      newIndex = direction > 0 ? 0 : filtered.length - 1;
+    }
+
+    openChallengeModal(filtered[newIndex]);
+  }
+
+  // Navigation Button Handlers
+  if (modalPrevCardBtn) modalPrevCardBtn.addEventListener("click", () => navigateCard(-1));
+  if (modalNextCardBtn) modalNextCardBtn.addEventListener("click", () => navigateCard(1));
+  if (floatingPrevCardBtn) floatingPrevCardBtn.addEventListener("click", () => navigateCard(-1));
+  if (floatingNextCardBtn) floatingNextCardBtn.addEventListener("click", () => navigateCard(1));
+
+  // Global Keyboard Navigation (ArrowLeft / ArrowRight / Escape)
+  window.addEventListener("keydown", (e) => {
+    if (!challengeModal.classList.contains("open")) return;
+
+    // Do not hijack arrows if user is focused on an input or textarea
+    const activeEl = document.activeElement;
+    const tagName = activeEl ? activeEl.tagName.toUpperCase() : "";
+    if (tagName === "INPUT" || tagName === "TEXTAREA") {
+      if (e.key === "Escape") {
+        activeEl.blur();
+      }
+      return;
+    }
+
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      navigateCard(-1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      navigateCard(1);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      closeChallengeModal();
+    }
+  });
+
+  // Close modal when clicking backdrop outside drawer
+  challengeModal.addEventListener("click", (e) => {
+    if (e.target === challengeModal) {
+      closeChallengeModal();
+    }
+  });
 
   // 3D Flip Card Action
   modalFlipCard.addEventListener("click", () => {
