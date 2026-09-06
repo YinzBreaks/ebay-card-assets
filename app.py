@@ -9,8 +9,16 @@ import numpy as np
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from PIL import Image
-import cv2
-import pyzbar.pyzbar as pyzbar
+try:
+    import cv2
+except Exception as e:
+    cv2 = None
+
+try:
+    import pyzbar.pyzbar as pyzbar
+except Exception as e:
+    pyzbar = None
+
 import openpyxl
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,7 +26,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 
 # Patch openpyxl font family bug
-openpyxl.styles.fonts.Font.family.max = 100
+try:
+    openpyxl.styles.fonts.Font.family.max = 100
+except Exception:
+    pass
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(APP_DIR, "assets")
@@ -28,9 +39,14 @@ CARDS_FILE = os.path.join(DATA_DIR, "cards.json")
 SETTINGS_FILE = os.path.join(DATA_DIR, "settings.json")
 TEMPLATE_FILE = os.path.join(APP_DIR, "eBay-category-listing-template.xlsx")
 
-os.makedirs(ASSETS_DIR, exist_ok=True)
-os.makedirs(DATA_DIR, exist_ok=True)
-os.makedirs(WEB_DIR, exist_ok=True)
+TMP_CARDS_FILE = "/tmp/cards.json"
+TMP_SETTINGS_FILE = "/tmp/settings.json"
+
+for d in [ASSETS_DIR, DATA_DIR, WEB_DIR]:
+    try:
+        os.makedirs(d, exist_ok=True)
+    except OSError:
+        pass
 
 CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main"
 
@@ -71,39 +87,75 @@ DEFAULT_SETTINGS = {
 }
 
 
+_in_memory_settings = None
+
 def load_settings():
-    if os.path.exists(SETTINGS_FILE):
-        try:
-            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    return DEFAULT_SETTINGS
+    global _in_memory_settings
+    if _in_memory_settings is not None:
+        return _in_memory_settings
+
+    for path in [TMP_SETTINGS_FILE, SETTINGS_FILE]:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    _in_memory_settings = json.load(f)
+                    return _in_memory_settings
+            except Exception:
+                pass
+
+    _in_memory_settings = dict(DEFAULT_SETTINGS)
+    return _in_memory_settings
 
 
 def save_settings(settings):
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
-        json.dump(settings, f, indent=2)
+    global _in_memory_settings
+    _in_memory_settings = settings
+    for path in [SETTINGS_FILE, TMP_SETTINGS_FILE]:
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(settings, f, indent=2)
+            break
+        except OSError:
+            continue
 
+
+_in_memory_cards = None
 
 def get_cards() -> List[Dict[str, Any]]:
-    if os.path.exists(CARDS_FILE):
-        try:
-            with open(CARDS_FILE, "r", encoding="utf-8") as f:
-                cards = json.load(f)
-                if cards:
-                    return cards
-        except Exception:
-            pass
+    global _in_memory_cards
+    if _in_memory_cards is not None:
+        return _in_memory_cards
+
+    for path in [TMP_CARDS_FILE, CARDS_FILE]:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    cards = json.load(f)
+                    if cards:
+                        _in_memory_cards = cards
+                        return cards
+            except Exception:
+                pass
+
     # Pre-seed from existing ebay_upload.csv if cards.json is empty
     cards = seed_cards_from_csv()
     save_cards(cards)
+    _in_memory_cards = cards
     return cards
 
 
 def save_cards(cards: List[Dict[str, Any]]):
-    with open(CARDS_FILE, "w", encoding="utf-8") as f:
-        json.dump(cards, f, indent=2)
+    global _in_memory_cards
+    _in_memory_cards = cards
+    for path in [CARDS_FILE, TMP_CARDS_FILE]:
+        try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(cards, f, indent=2)
+            break
+        except OSError:
+            continue
 
 
 def seed_cards_from_csv() -> List[Dict[str, Any]]:
@@ -198,20 +250,39 @@ def seed_cards_from_csv() -> List[Dict[str, Any]]:
 
 
 def extract_cert_from_cv_image(cv_img) -> Optional[str]:
-    """Tries to decode QR code or Code128 barcode using pyzbar"""
-    try:
-        decoded = pyzbar.decode(cv_img)
-        for obj in decoded:
-            data = obj.data.decode("utf-8", errors="ignore").strip()
-            # If it's a PSA QR link: https://www.psacard.com/cert/101889066/
-            m = re.search(r'cert/(\d{7,10})', data)
-            if m:
-                return m.group(1)
-            # Direct numeric barcode
-            if re.match(r'^\d{7,10}$', data):
-                return data
-    except Exception as e:
-        print(f"Barcode decode exception: {e}")
+    """Tries to decode QR code or Code128 barcode using pyzbar, with cv2.QRCodeDetector fallback"""
+    if cv_img is None:
+        return None
+
+    if pyzbar is not None:
+        try:
+            decoded = pyzbar.decode(cv_img)
+            for obj in decoded:
+                data = obj.data.decode("utf-8", errors="ignore").strip()
+                # If it's a PSA QR link: https://www.psacard.com/cert/101889066/
+                m = re.search(r'cert/(\d{7,10})', data)
+                if m:
+                    return m.group(1)
+                # Direct numeric barcode
+                if re.match(r'^\d{7,10}$', data):
+                    return data
+        except Exception as e:
+            print(f"Barcode decode exception: {e}")
+
+    # Fallback to OpenCV QRCodeDetector
+    if cv2 is not None and hasattr(cv2, "QRCodeDetector"):
+        try:
+            detector = cv2.QRCodeDetector()
+            data, bbox, _ = detector.detectAndDecode(cv_img)
+            if data:
+                m = re.search(r'cert/(\d{7,10})', data)
+                if m:
+                    return m.group(1)
+                if re.match(r'^\d{7,10}$', data):
+                    return data
+        except Exception as e:
+            print(f"OpenCV QRCodeDetector exception: {e}")
+
     return None
 
 
@@ -648,17 +719,28 @@ def export_listings(req: ExportRequest):
     # 1. Write clean CSV
     output_csv_assets = os.path.join(ASSETS_DIR, "eBay_Bulk_Upload_Completed.csv")
     output_csv_root = os.path.join(APP_DIR, "eBay_Bulk_Upload_Completed.csv")
+    output_csv_tmp = "/tmp/eBay_Bulk_Upload_Completed.csv"
 
-    with open(output_csv_assets, "w", newline="", encoding="utf-8-sig") as f:
-        writer = csv.writer(f)
-        writer.writerow(headers)
-        for r in data_rows:
-            writer.writerow(r)
-    shutil.copy2(output_csv_assets, output_csv_root)
+    for target_csv in [output_csv_assets, output_csv_tmp]:
+        try:
+            os.makedirs(os.path.dirname(target_csv), exist_ok=True)
+            with open(target_csv, "w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.writer(f)
+                writer.writerow(headers)
+                for r in data_rows:
+                    writer.writerow(r)
+            try:
+                shutil.copy2(target_csv, output_csv_root)
+            except OSError:
+                pass
+            break
+        except OSError:
+            continue
 
     # 2. Write clean XLSX using openpyxl (Fast, thread-safe, NO COM)
     output_xlsx_assets = os.path.join(ASSETS_DIR, "eBay_Bulk_Upload_Completed.xlsx")
     output_xlsx_root = os.path.join(APP_DIR, "eBay_Bulk_Upload_Completed.xlsx")
+    output_xlsx_tmp = "/tmp/eBay_Bulk_Upload_Completed.xlsx"
 
     wb_out = openpyxl.Workbook()
     ws_out = wb_out.active
@@ -667,7 +749,8 @@ def export_listings(req: ExportRequest):
     # Copy row 1-3 metadata
     for r in range(1, 4):
         for c in range(1, len(headers) + 1):
-            ws_out.cell(r, c).value = ws_template.cell(r, c).value
+            if ws_template:
+                ws_out.cell(r, c).value = ws_template.cell(r, c).value
 
     # Write headers at row 4
     for c, h in enumerate(headers, 1):
@@ -686,8 +769,17 @@ def export_listings(req: ExportRequest):
                     pass
             ws_out.cell(r_idx, c_idx).value = val
 
-    wb_out.save(output_xlsx_assets)
-    shutil.copy2(output_xlsx_assets, output_xlsx_root)
+    for target_xlsx in [output_xlsx_assets, output_xlsx_tmp]:
+        try:
+            os.makedirs(os.path.dirname(target_xlsx), exist_ok=True)
+            wb_out.save(target_xlsx)
+            try:
+                shutil.copy2(target_xlsx, output_xlsx_root)
+            except OSError:
+                pass
+            break
+        except OSError:
+            continue
 
     total_value = sum(float(c.get("list_price", 0)) for c in cards_to_export)
 
@@ -703,17 +795,18 @@ def export_listings(req: ExportRequest):
 
 @app.get("/api/download/{filename}")
 def download_file(filename: str):
-    file_path = os.path.join(ASSETS_DIR, filename)
-    if not os.path.exists(file_path):
-        file_path = os.path.join(APP_DIR, filename)
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="Requested file does not exist.")
-    return FileResponse(file_path, filename=filename, media_type="application/octet-stream")
+    for candidate_dir in [ASSETS_DIR, APP_DIR, "/tmp"]:
+        file_path = os.path.join(candidate_dir, filename)
+        if os.path.exists(file_path):
+            return FileResponse(file_path, filename=filename, media_type="application/octet-stream")
+    raise HTTPException(status_code=404, detail="Requested file does not exist.")
 
 
-# Static mounts
-app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
-app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+# Static mounts for local development & fallback
+if os.path.exists(ASSETS_DIR):
+    app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
+if os.path.exists(WEB_DIR):
+    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
 
 
 if __name__ == "__main__":

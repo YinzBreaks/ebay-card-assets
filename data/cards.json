@@ -1,5 +1,49 @@
 [
   {
+    "sku": "FCB-SELECT-110-PSA10",
+    "title": "2024-25 Panini Select Lamine Yamal Mojo RC",
+    "player": "Select",
+    "team": "FCB",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "Panini Select",
+    "card_number": "110",
+    "parallel": "Prizm",
+    "grader": "PSA",
+    "grade": "10",
+    "cert_number": "101889066",
+    "list_price": 402.5,
+    "auto_accept": 342.12,
+    "min_offer": 301.88,
+    "base_comp": 350.0,
+    "justification": "Verified PSA 10 (Cert #101889066). Market comp baseline: $350.00. +15% premium applied for FixedPrice Buy-It-Now ($402.50). Auto-Accept protected at 85% ($342.12) with minimum floor at 75% ($301.88).",
+    "front_url": "/assets/9_6_28_upload/FCB-SELECT-110-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/FCB-SELECT-110-PSA10-BACK.jpg",
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-110-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-110-PSA10-BACK.jpg",
+    "status": "COMPED",
+    "comps": [
+      {
+        "date": "2 days ago",
+        "platform": "eBay Sold",
+        "price": 343.0,
+        "grade": "PSA 10"
+      },
+      {
+        "date": "5 days ago",
+        "platform": "130Point / PWCC",
+        "price": 367.5,
+        "grade": "PSA 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 332.5,
+        "grade": "PSA 10"
+      }
+    ]
+  },
+  {
     "sku": "FCB-SELECT-222-PSA10",
     "title": "2024-25 Panini Select Lamine Yamal Mojo RC",
     "player": "Select",
@@ -12,11 +56,11 @@
     "grader": "PSA",
     "grade": "10",
     "cert_number": "101889066",
-    "list_price": 402.5,
-    "auto_accept": 342.12,
-    "min_offer": 301.88,
+    "list_price": 525.0,
+    "auto_accept": 446.25,
+    "min_offer": 393.75,
     "base_comp": 350.0,
-    "justification": "Adjusted valuation: $402.50. Auto-Accept at $342.12, Min Floor at $301.88. [CHALLENGED: '+15% Serial Numbered / Low Print']",
+    "justification": "Adjusted valuation: $525.00. Auto-Accept at $446.25, Min Floor at $393.75. [CHALLENGED: 'Rare /25 Pink parallel. High demand rookie.']",
     "front_url": "/assets/9_6_28_upload/FCB-SELECT-222-PSA10-FRONT.jpg",
     "back_url": "/assets/9_6_28_upload/FCB-SELECT-222-PSA10-BACK.jpg",
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-222-PSA10-FRONT.jpg",
