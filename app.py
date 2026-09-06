@@ -305,6 +305,19 @@ async def add_no_cache_headers(request, call_next):
     return response
 
 
+@app.exception_handler(404)
+async def custom_404_handler(request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Not Found",
+            "request_path": request.url.path,
+            "scope_path": request.scope.get("path"),
+            "scope_root_path": request.scope.get("root_path")
+        }
+    )
+
+
 class ChallengeRequest(BaseModel):
     sku: str
     feedback: Optional[str] = None
