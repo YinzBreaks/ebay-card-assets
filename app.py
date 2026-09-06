@@ -322,11 +322,13 @@ class ExportRequest(BaseModel):
 
 
 @app.get("/api/settings")
+@app.get("/settings")
 def get_settings_endpoint():
     return load_settings()
 
 
 @app.post("/api/settings")
+@app.post("/settings")
 def save_settings_endpoint(settings: Dict[str, Any]):
     cur = load_settings()
     cur.update(settings)
@@ -335,12 +337,14 @@ def save_settings_endpoint(settings: Dict[str, Any]):
 
 
 @app.get("/api/cards")
+@app.get("/cards")
 def get_cards_endpoint():
     cards = get_cards()
     return {"cards": cards, "total": len(cards)}
 
 
 @app.post("/api/upload")
+@app.post("/upload")
 async def upload_card(
     file: Optional[UploadFile] = File(None),
     front: Optional[UploadFile] = File(None),
@@ -498,6 +502,7 @@ async def upload_card(
 
 
 @app.post("/api/challenge")
+@app.post("/challenge")
 def challenge_comp(req: ChallengeRequest):
     cards = get_cards()
     target = None
@@ -538,6 +543,7 @@ def challenge_comp(req: ChallengeRequest):
 
 
 @app.post("/api/approve")
+@app.post("/approve")
 def approve_cards(req: ApproveRequest):
     cards = get_cards()
     approved_count = 0
@@ -550,6 +556,7 @@ def approve_cards(req: ApproveRequest):
 
 
 @app.delete("/api/cards/{sku}")
+@app.delete("/cards/{sku}")
 def delete_card(sku: str):
     cards = get_cards()
     filtered = [c for c in cards if c.get("sku") != sku]
@@ -558,6 +565,7 @@ def delete_card(sku: str):
 
 
 @app.post("/api/export")
+@app.post("/export")
 def export_listings(req: ExportRequest):
     """
     Exports approved listings to eBay category template using openpyxl & csv.
@@ -794,6 +802,7 @@ def export_listings(req: ExportRequest):
 
 
 @app.get("/api/download/{filename}")
+@app.get("/download/{filename}")
 def download_file(filename: str):
     for candidate_dir in [ASSETS_DIR, APP_DIR, "/tmp"]:
         file_path = os.path.join(candidate_dir, filename)
