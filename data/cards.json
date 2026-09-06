@@ -61,8 +61,8 @@
     "min_offer": 393.75,
     "base_comp": 417.38,
     "justification": "Adjusted valuation: $525.00. Auto-Accept at $446.25, Min Floor at $393.75. [CHALLENGED: 'Rare /25 Pink parallel. High demand rookie.']",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -83,7 +83,9 @@
         "price": 451.19,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-BACK.jpg"
   },
   {
     "sku": "RMA-VINI-112-PSA10",
@@ -103,8 +105,8 @@
     "min_offer": 300.0,
     "base_comp": 373.9,
     "justification": "Market baseline ~$373.90 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-VINI-112-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-VINI-112-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/RMA-VINI-112-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/RMA-VINI-112-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -125,7 +127,9 @@
         "price": 404.19,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-VINI-112-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-VINI-112-PSA10-BACK.jpg"
   },
   {
     "sku": "DIS-RAYA-174-PSA10",
@@ -145,8 +149,8 @@
     "min_offer": 180.0,
     "base_comp": 217.38,
     "justification": "Market baseline ~$217.38 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/DIS-RAYA-174-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/DIS-RAYA-174-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/DIS-RAYA-174-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/DIS-RAYA-174-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -167,7 +171,9 @@
         "price": 234.99,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/DIS-RAYA-174-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/DIS-RAYA-174-PSA10-BACK.jpg"
   },
   {
     "sku": "UGA-BECK-1OF1-PSA9",
@@ -187,8 +193,8 @@
     "min_offer": 140.0,
     "base_comp": 191.3,
     "justification": "Market baseline ~$191.30 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -209,7 +215,9 @@
         "price": 206.79,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-BACK.jpg"
   },
   {
     "sku": "USA-PULISIC-201-PSA10",
@@ -229,8 +237,8 @@
     "min_offer": 90.0,
     "base_comp": 113.03,
     "justification": "Market baseline ~$113.03 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/USA-PULISIC-201-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/USA-PULISIC-201-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/USA-PULISIC-201-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/USA-PULISIC-201-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -251,7 +259,9 @@
         "price": 122.19,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/USA-PULISIC-201-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/USA-PULISIC-201-PSA10-BACK.jpg"
   },
   {
     "sku": "ENG-PALMER-166-PSA9",
@@ -271,8 +281,8 @@
     "min_offer": 75.0,
     "base_comp": 104.34,
     "justification": "Market baseline ~$104.34 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/ENG-PALMER-166-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/ENG-PALMER-166-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/ENG-PALMER-166-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/ENG-PALMER-166-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -293,7 +303,9 @@
         "price": 112.79,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/ENG-PALMER-166-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/ENG-PALMER-166-PSA9-BACK.jpg"
   },
   {
     "sku": "SPONGE-KAREN-SAK-PSA9",
@@ -313,8 +325,8 @@
     "min_offer": 75.0,
     "base_comp": 99.99,
     "justification": "Market baseline ~$99.99 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -335,7 +347,9 @@
         "price": 108.09,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-BACK.jpg"
   },
   {
     "sku": "MCI-HAALAND-227-PSA9",
@@ -355,8 +369,8 @@
     "min_offer": 65.0,
     "base_comp": 86.95,
     "justification": "Market baseline ~$86.95 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -377,7 +391,9 @@
         "price": 93.99,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-BACK.jpg"
   },
   {
     "sku": "MUN-BADGE-199-PSA9",
@@ -397,8 +413,8 @@
     "min_offer": 85.0,
     "base_comp": 92.17,
     "justification": "Market baseline ~$92.17 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-BADGE-199-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MUN-BADGE-199-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/MUN-BADGE-199-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/MUN-BADGE-199-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -419,7 +435,9 @@
         "price": 99.63,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-BADGE-199-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-BADGE-199-PSA9-BACK.jpg"
   },
   {
     "sku": "LIV-ALISSON-PAB-PSA10",
@@ -439,8 +457,8 @@
     "min_offer": 210.0,
     "base_comp": 234.77,
     "justification": "Market baseline ~$234.77 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -461,7 +479,9 @@
         "price": 253.79,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-BACK.jpg"
   },
   {
     "sku": "LIV-GERRARD-SSG-PSA10",
@@ -481,8 +501,8 @@
     "min_offer": 200.0,
     "base_comp": 226.08,
     "justification": "Market baseline ~$226.08 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -503,7 +523,9 @@
         "price": 244.39,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-BACK.jpg"
   },
   {
     "sku": "PAL-ENDRICK-158-PSA10",
@@ -523,8 +545,8 @@
     "min_offer": 195.0,
     "base_comp": 217.38,
     "justification": "Market baseline ~$217.38 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -545,7 +567,9 @@
         "price": 234.99,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-BACK.jpg"
   },
   {
     "sku": "LIV-CHIESA-136-PSA10",
@@ -565,8 +589,8 @@
     "min_offer": 145.0,
     "base_comp": 173.9,
     "justification": "Market baseline ~$173.90 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -587,7 +611,9 @@
         "price": 187.99,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-BACK.jpg"
   },
   {
     "sku": "FCB-GAVI-PATCHAUTO-3",
@@ -607,8 +633,8 @@
     "min_offer": 380.0,
     "base_comp": 521.73,
     "justification": "Market baseline ~$521.73 based on 3 recent   sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-FRONT.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-BACK.jpg",
+    "front_url": "/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -629,7 +655,9 @@
         "price": 563.99,
         "grade": " "
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-BACK.jpg"
   },
   {
     "sku": "CHE-ENZO-AEF-PSA10",
@@ -649,8 +677,8 @@
     "min_offer": 95.0,
     "base_comp": 121.73,
     "justification": "Market baseline ~$121.73 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10.jpg",
+    "front_url": "/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -671,7 +699,9 @@
         "price": 131.59,
         "grade": "Professional Sports Authenticator (PSA) 10"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-BACK.jpg"
   },
   {
     "sku": "MCI-SHAW-BS-PSA9",
@@ -691,8 +721,8 @@
     "min_offer": 65.0,
     "base_comp": 86.95,
     "justification": "Market baseline ~$86.95 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -713,7 +743,9 @@
         "price": 93.99,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-BACK.jpg"
   },
   {
     "sku": "SCP-QUENDA-BAGQ-PSA9",
@@ -733,8 +765,8 @@
     "min_offer": 90.0,
     "base_comp": 99.99,
     "justification": "Market baseline ~$99.99 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -755,7 +787,9 @@
         "price": 108.09,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-BACK.jpg"
   },
   {
     "sku": "RMA-ATHENEA-AD-PSA9",
@@ -775,8 +809,8 @@
     "min_offer": 85.0,
     "base_comp": 108.79,
     "justification": "Market baseline ~$108.79 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -797,7 +831,9 @@
         "price": 117.6,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-BACK.jpg"
   },
   {
     "sku": "FCB-LEON-FR8-PSA9",
@@ -817,8 +853,8 @@
     "min_offer": 60.0,
     "base_comp": 69.78,
     "justification": "Market baseline ~$69.78 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
-    "front_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9.jpg",
-    "back_url": "https://raw.githubusercontent.com/YinzBreaks/ebay-card-assets/main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9.jpg",
+    "front_url": "/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-BACK.jpg",
     "status": "APPROVED",
     "comps": [
       {
@@ -839,6 +875,8 @@
         "price": 75.44,
         "grade": "Professional Sports Authenticator (PSA) 9"
       }
-    ]
+    ],
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-BACK.jpg"
   }
 ]

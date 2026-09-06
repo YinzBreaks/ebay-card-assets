@@ -150,10 +150,19 @@ def seed_cards_from_csv() -> List[Dict[str, Any]]:
                 season = str(row.get("Season", "")).strip()
                 card_set = str(row.get("Set", "")).strip()
 
-                photo_url = str(row.get("Item photo URL", "")).strip()
-                urls = [u.strip() for u in photo_url.split("|") if u.strip()]
-                front_url = urls[0] if len(urls) > 0 else f"/assets/9_6_28_upload/{sku}.jpg"
-                back_url = urls[1] if len(urls) > 1 else (f"/assets/9_6_28_upload/{sku}-BACK.jpg" if "GAVI" in sku else front_url)
+                front_filename = f"{sku}-FRONT.jpg"
+                back_filename = f"{sku}-BACK.jpg"
+                batch_dir = os.path.join(ASSETS_DIR, "9_6_28_upload")
+
+                if os.path.exists(os.path.join(batch_dir, front_filename)):
+                    front_url = f"/assets/9_6_28_upload/{front_filename}"
+                else:
+                    front_url = f"/assets/9_6_28_upload/{sku}.jpg"
+
+                if os.path.exists(os.path.join(batch_dir, back_filename)):
+                    back_url = f"/assets/9_6_28_upload/{back_filename}"
+                else:
+                    back_url = front_url
 
                 card = {
                     "sku": sku,
@@ -215,6 +224,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_no_cache_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 class ChallengeRequest(BaseModel):
@@ -286,8 +303,8 @@ async def upload_card(
         cert_extracted = extract_cert_from_cv_image(img)
 
         # Detect dual-shot canvas split
-        if w > h * 1.15:
-            # Landscape side-by-side split: Left is Front, Right is Back
+        if w >= h * 0.9:
+            # Landscape or square side-by-side split: Left is Front, Right is Back
             half = w // 2
             front_img = img[:, :half]
             back_img = img[:, half:]

@@ -175,13 +175,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (gradeStr.includes("9")) gradeBadgeClass = "badge-psa-9";
       if (String(card.grader || "").toUpperCase().includes("BGS")) gradeBadgeClass = "badge-bgs";
 
-      const frontImg = card.front_url || `/assets/9_6_28_upload/${card.sku}.jpg`;
+      const frontImg = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
+        ? card.front_url
+        : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`;
 
       tr.innerHTML = `
         <td><input type="checkbox" class="row-checkbox" ${isChecked ? "checked" : ""}></td>
         <td>
           <div class="slab-thumb-wrap" title="Click to inspect card">
-            <img src="${frontImg}" alt="${card.sku}" onerror="this.src='/assets/9_6_28_upload/${card.sku}-FRONT.jpg'">
+            <img src="${frontImg}" alt="${card.sku}" onerror="if (this.src.indexOf('-FRONT') !== -1) { this.src = '/assets/9_6_28_upload/${card.sku}.jpg'; }">
           </div>
         </td>
         <td>
@@ -302,8 +304,13 @@ document.addEventListener("DOMContentLoaded", () => {
     modalSkuCode.textContent = card.sku;
     modalCertCode.textContent = `Cert #${card.cert_number || 'N/A'} • ${card.grader || 'PSA'} Grade ${card.grade || '10'}`;
 
-    const frontSrc = card.front_url || `/assets/9_6_28_upload/${card.sku}.jpg`;
-    const backSrc = card.back_url || card.front_url || `/assets/9_6_28_upload/${card.sku}-BACK.jpg`;
+    const frontSrc = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
+      ? card.front_url
+      : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`;
+    const backSrc = (card.back_url && !card.back_url.endsWith(`/${card.sku}.jpg`))
+      ? card.back_url
+      : `/assets/9_6_28_upload/${card.sku}-BACK.jpg`;
+
     modalFrontImg.src = frontSrc;
     modalBackImg.src = backSrc;
 
