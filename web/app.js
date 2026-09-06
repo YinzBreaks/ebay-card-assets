@@ -35,6 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const quickTitle = document.getElementById("quickTitle");
   const quickBasePrice = document.getElementById("quickBasePrice");
   const modeRadios = document.querySelectorAll("input[name='uploadMode']");
+  const batchPreviewBar = document.getElementById("batchPreviewBar");
+  const batchCountBadge = document.getElementById("batchCountBadge");
+  const batchDetailText = document.getElementById("batchDetailText");
+  const clearBatchBtn = document.getElementById("clearBatchBtn");
+  const uploadProgressWrap = document.getElementById("uploadProgressWrap");
+  const uploadProgressBar = document.getElementById("uploadProgressBar");
+  const uploadProgressText = document.getElementById("uploadProgressText");
 
   // Challenge Modal Elements
   const challengeModal = document.getElementById("challengeModal");
@@ -600,8 +607,8 @@ document.addEventListener("DOMContentLoaded", () => {
     updateKPIs();
   });
 
-  // --- Upload & Ingestion Logic ---
-  let selectedUploadFiles = { file: null, front: null, back: null };
+  // --- Upload & Ingestion Logic (Batch Multi-File Ready) ---
+  let uploadQueue = []; // Array of { mode: 'dual'|'separate', file?: File, front?: File, back?: File, name: string, size: number }
 
   // Mode radio switch
   modeRadios.forEach(r => {
@@ -612,13 +619,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (mode === "dual") {
         document.querySelector(".drop-hint").textContent = "Supports dual-shot photos (auto 50/50 canvas split). Auto-detects PSA QR/barcode.";
       } else {
-        document.querySelector(".drop-hint").textContent = "Select separate front and back card images.";
+        document.querySelector(".drop-hint").textContent = "Select front & back card photos (auto-pairs matching filenames or sequential scans).";
       }
+      uploadQueue = [];
+      updateUploadBatchUI();
     });
   });
 
   dropZone.addEventListener("click", (e) => {
-    if (e.target.closest(".quick-meta-bar")) return;
+    if (e.target.closest(".quick-meta-bar") || e.target.closest("#batchPreviewBar") || e.target.closest("#uploadProgressWrap")) return;
     const mode = document.querySelector("input[name='uploadMode']:checked").value;
     if (mode === "dual") {
       fileInput.click();
@@ -647,86 +656,241 @@ document.addEventListener("DOMContentLoaded", () => {
       handleFilesSelected(e.target.files);
     }
   });
+
   frontInput.addEventListener("change", (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      selectedUploadFiles.front = e.target.files[0];
-      // prompt for back
-      backInput.click();
+      if (e.target.files.length === 1) {
+        // Single front selected, add and prompt for back
+        const f = e.target.files[0];
+        uploadQueue.push({
+          mode: 'separate',
+          front: f,
+          back: null,
+          name: f.name,
+          size: f.size
+        });
+        updateUploadBatchUI();
+        backInput.click();
+      } else {
+        // Multiple files selected in front picker
+        handleFilesSelected(e.target.files);
+      }
     }
   });
+
   backInput.addEventListener("change", (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      selectedUploadFiles.back = e.target.files[0];
-      document.querySelector(".drop-text h3").innerHTML = `Selected Front: <strong>${selectedUploadFiles.front.name}</strong> & Back: <strong>${selectedUploadFiles.back.name}</strong>`;
+      if (uploadQueue.length > 0 && uploadQueue[uploadQueue.length - 1].mode === 'separate' && !uploadQueue[uploadQueue.length - 1].back) {
+        uploadQueue[uploadQueue.length - 1].back = e.target.files[0];
+        uploadQueue[uploadQueue.length - 1].size += e.target.files[0].size;
+        uploadQueue[uploadQueue.length - 1].name = `${uploadQueue[uploadQueue.length - 1].front.name} + ${e.target.files[0].name}`;
+        updateUploadBatchUI();
+      } else {
+        handleFilesSelected(e.target.files);
+      }
     }
   });
 
-  function handleFilesSelected(filesList) {
-    const mode = document.querySelector("input[name='uploadMode']:checked").value;
-    if (mode === "dual" || filesList.length === 1) {
-      selectedUploadFiles.file = filesList[0];
-      document.querySelector(".drop-text h3").innerHTML = `Selected Dual-Shot: <strong>${filesList[0].name}</strong>`;
-    } else if (filesList.length >= 2) {
-      selectedUploadFiles.front = filesList[0];
-      selectedUploadFiles.back = filesList[1];
-      document.querySelector(".drop-text h3").innerHTML = `Selected Front: <strong>${filesList[0].name}</strong> & Back: <strong>${filesList[1].name}</strong>`;
-    }
+  if (clearBatchBtn) {
+    clearBatchBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      uploadQueue = [];
+      updateUploadBatchUI();
+    });
   }
 
-  processUploadBtn.addEventListener("click", async () => {
-    const formData = new FormData();
+  function handleFilesSelected(filesList) {
+    if (!filesList || filesList.length === 0) return;
+    const files = Array.from(filesList);
     const mode = document.querySelector("input[name='uploadMode']:checked").value;
 
     if (mode === "dual") {
-      if (!selectedUploadFiles.file) {
-        alert("Please drop or choose a card slab image first.");
-        return;
-      }
-      formData.append("file", selectedUploadFiles.file);
+      files.forEach(file => {
+        if (!uploadQueue.some(item => item.file && item.file.name === file.name && item.file.size === file.size)) {
+          uploadQueue.push({
+            mode: 'dual',
+            file: file,
+            name: file.name,
+            size: file.size
+          });
+        }
+      });
     } else {
-      if (!selectedUploadFiles.front) {
-        alert("Please select front card photo.");
-        return;
+      // Separate Front & Back Mode
+      const frontRegex = /[-_](?:front|f|1)\.[^.]+$/i;
+      const backRegex = /[-_](?:back|b|2)\.[^.]+$/i;
+
+      const fronts = files.filter(f => frontRegex.test(f.name));
+      const backs = files.filter(f => backRegex.test(f.name));
+
+      if (fronts.length > 0 && backs.length > 0) {
+        fronts.forEach(front => {
+          const stem = front.name.replace(frontRegex, '');
+          const matchingBack = backs.find(b => b.name.replace(backRegex, '') === stem);
+          uploadQueue.push({
+            mode: 'separate',
+            front: front,
+            back: matchingBack || null,
+            name: matchingBack ? `${front.name} + ${matchingBack.name}` : front.name,
+            size: front.size + (matchingBack ? matchingBack.size : 0)
+          });
+        });
+        const matchedNames = new Set(uploadQueue.map(q => q.front?.name).concat(uploadQueue.map(q => q.back?.name)));
+        const remaining = files.filter(f => !matchedNames.has(f.name));
+        for (let i = 0; i < remaining.length; i += 2) {
+          const f1 = remaining[i];
+          const f2 = remaining[i + 1] || null;
+          uploadQueue.push({
+            mode: 'separate',
+            front: f1,
+            back: f2,
+            name: f2 ? `${f1.name} + ${f2.name}` : f1.name,
+            size: f1.size + (f2 ? f2.size : 0)
+          });
+        }
+      } else {
+        // Sequential pairing: 2 photos per slab
+        for (let i = 0; i < files.length; i += 2) {
+          const f1 = files[i];
+          const f2 = files[i + 1] || null;
+          uploadQueue.push({
+            mode: 'separate',
+            front: f1,
+            back: f2,
+            name: f2 ? `${f1.name} + ${f2.name}` : f1.name,
+            size: f1.size + (f2 ? f2.size : 0)
+          });
+        }
       }
-      formData.append("front", selectedUploadFiles.front);
-      if (selectedUploadFiles.back) formData.append("back", selectedUploadFiles.back);
     }
 
-    formData.append("grader", quickGrader.value);
-    formData.append("grade", quickGrade.value);
-    if (quickTitle.value) formData.append("card_title", quickTitle.value);
-    if (quickBasePrice.value) formData.append("base_price", quickBasePrice.value);
+    updateUploadBatchUI();
+  }
+
+  function updateUploadBatchUI() {
+    if (uploadQueue.length === 0) {
+      if (batchPreviewBar) batchPreviewBar.style.display = "none";
+      const dropTitle = document.querySelector(".drop-text h3");
+      if (dropTitle) dropTitle.innerHTML = `Drop card slab photos here, or <span class="browse-link">browse files</span>`;
+      fileInput.value = "";
+      frontInput.value = "";
+      backInput.value = "";
+      processUploadBtn.innerHTML = "<span>Process & Comp</span>";
+      processUploadBtn.disabled = false;
+      return;
+    }
+
+    if (batchPreviewBar) batchPreviewBar.style.display = "flex";
+    const totalBytes = uploadQueue.reduce((acc, q) => acc + (q.size || 0), 0);
+    const totalMb = (totalBytes / (1024 * 1024)).toFixed(1);
+
+    if (batchCountBadge) {
+      batchCountBadge.textContent = `${uploadQueue.length} SLAB${uploadQueue.length > 1 ? 'S' : ''} QUEUED`;
+    }
+    if (batchDetailText) {
+      if (uploadQueue.length === 1) {
+        batchDetailText.textContent = `${uploadQueue[0].name} (${totalMb} MB) ready for ingestion`;
+      } else {
+        batchDetailText.textContent = `${uploadQueue.length} slabs ready (${totalMb} MB total) • Auto-splitting & Comping`;
+      }
+    }
+
+    const dropTitle = document.querySelector(".drop-text h3");
+    if (dropTitle) {
+      if (uploadQueue.length === 1) {
+        dropTitle.innerHTML = `Queued: <strong>${uploadQueue[0].name}</strong> (${totalMb} MB)`;
+      } else {
+        dropTitle.innerHTML = `Queued: <strong>${uploadQueue.length} card slabs</strong> (${totalMb} MB total)`;
+      }
+    }
+
+    processUploadBtn.innerHTML = `<span>Process & Comp ${uploadQueue.length} Slab${uploadQueue.length > 1 ? 's' : ''}</span>`;
+  }
+
+  processUploadBtn.addEventListener("click", async () => {
+    if (uploadQueue.length === 0) {
+      alert("Please drop or choose card slab images first.");
+      return;
+    }
 
     processUploadBtn.disabled = true;
-    processUploadBtn.innerHTML = "<span>Processing Slab...</span>";
+    processUploadBtn.innerHTML = `<span>Processing Batch (0/${uploadQueue.length})...</span>`;
+    if (uploadProgressWrap) {
+      uploadProgressWrap.style.display = "block";
+      if (uploadProgressBar) uploadProgressBar.style.width = "0%";
+      if (uploadProgressText) uploadProgressText.textContent = `Starting ingestion for ${uploadQueue.length} slab(s)...`;
+    }
 
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData
-      });
-      const data = await res.json();
-      if (data.status === "success") {
-        cards.unshift(data.card);
-        renderTable();
-        updateKPIs();
-        // Reset inputs
-        selectedUploadFiles = { file: null, front: null, back: null };
-        quickTitle.value = "";
-        quickBasePrice.value = "";
-        document.querySelector(".drop-text h3").innerHTML = `Drop card slab photos here, or <span class="browse-link">browse files</span>`;
-        // Open challenge modal on newly added card
-        openChallengeModal(data.card);
-      } else {
-        alert("Upload error: " + (data.detail || "Failed to process card"));
+    let successCount = 0;
+    let failCount = 0;
+    let lastAddedCard = null;
+
+    for (let i = 0; i < uploadQueue.length; i++) {
+      const item = uploadQueue[i];
+      const pct = Math.round((i / uploadQueue.length) * 100);
+      if (uploadProgressBar) uploadProgressBar.style.width = `${pct}%`;
+      if (uploadProgressText) {
+        uploadProgressText.textContent = `Ingesting slab ${i + 1} of ${uploadQueue.length}: ${item.name}...`;
       }
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Error uploading card: " + err.message);
-    } finally {
+      processUploadBtn.innerHTML = `<span>Processing (${i + 1}/${uploadQueue.length})...</span>`;
+
+      const formData = new FormData();
+      if (item.mode === "dual") {
+        formData.append("file", item.file);
+      } else {
+        formData.append("front", item.front);
+        if (item.back) formData.append("back", item.back);
+      }
+
+      formData.append("grader", quickGrader.value);
+      formData.append("grade", quickGrade.value);
+      if (quickTitle.value && uploadQueue.length === 1) {
+        formData.append("card_title", quickTitle.value);
+      }
+      if (quickBasePrice.value && uploadQueue.length === 1) {
+        formData.append("base_price", quickBasePrice.value);
+      }
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          cards.unshift(data.card);
+          renderTable();
+          updateKPIs();
+          successCount++;
+          lastAddedCard = data.card;
+        } else {
+          console.error(`Upload error for ${item.name}:`, data.detail);
+          failCount++;
+        }
+      } catch (err) {
+        console.error(`Network error for ${item.name}:`, err);
+        failCount++;
+      }
+    }
+
+    if (uploadProgressBar) uploadProgressBar.style.width = "100%";
+    if (uploadProgressText) {
+      uploadProgressText.textContent = `Batch complete! ${successCount} slab${successCount === 1 ? '' : 's'} ingested successfully.${failCount > 0 ? ` (${failCount} failed)` : ''}`;
+    }
+
+    uploadQueue = [];
+    quickTitle.value = "";
+    quickBasePrice.value = "";
+
+    setTimeout(() => {
+      if (uploadProgressWrap) uploadProgressWrap.style.display = "none";
+      updateUploadBatchUI();
       processUploadBtn.disabled = false;
       processUploadBtn.innerHTML = "<span>Process & Comp</span>";
-    }
+      if (successCount === 1 && lastAddedCard) {
+        openChallengeModal(lastAddedCard);
+      }
+    }, 2000);
   });
 
   // --- Export Workflow ---

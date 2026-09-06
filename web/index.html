@@ -91,9 +91,25 @@
               <h3>Drop card slab photos here, or <span class="browse-link">browse files</span></h3>
               <p class="drop-hint">Supports dual-shot photos (auto 50/50 canvas split) or front/back pairs. Auto-detects PSA QR/barcode.</p>
             </div>
-            <input type="file" id="fileInput" accept="image/jpeg,image/png" style="display: none;">
-            <input type="file" id="frontInput" accept="image/jpeg,image/png" style="display: none;">
-            <input type="file" id="backInput" accept="image/jpeg,image/png" style="display: none;">
+            <input type="file" id="fileInput" accept="image/jpeg,image/png" multiple style="display: none;">
+            <input type="file" id="frontInput" accept="image/jpeg,image/png" multiple style="display: none;">
+            <input type="file" id="backInput" accept="image/jpeg,image/png" multiple style="display: none;">
+          </div>
+
+          <!-- Batch Upload Status & Progress -->
+          <div class="batch-preview-bar" id="batchPreviewBar" style="display: none;">
+            <div class="batch-info">
+              <span class="badge-tag" id="batchCountBadge">0 SLABS QUEUED</span>
+              <span class="batch-detail" id="batchDetailText">Ready for bulk ingestion</span>
+            </div>
+            <button class="btn btn-sm btn-secondary" id="clearBatchBtn" type="button">Clear Batch</button>
+          </div>
+
+          <div class="upload-progress-wrap" id="uploadProgressWrap" style="display: none;">
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="uploadProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="progress-status-text" id="uploadProgressText">Processing 1 of 10...</div>
           </div>
 
           <!-- Quick Slab Meta Extractor Fields (Optional Overrides) -->
