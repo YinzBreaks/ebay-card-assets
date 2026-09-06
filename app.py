@@ -802,6 +802,31 @@ def download_file(filename: str):
     raise HTTPException(status_code=404, detail="Requested file does not exist.")
 
 
+# Explicit routes for root, CSS, and JS
+@app.get("/")
+def get_index():
+    for p in [os.path.join(APP_DIR, "index.html"), os.path.join(WEB_DIR, "index.html")]:
+        if os.path.exists(p):
+            return FileResponse(p, media_type="text/html")
+    return JSONResponse({"status": "CardFlow API Online"})
+
+
+@app.get("/style.css")
+def get_css():
+    for p in [os.path.join(APP_DIR, "style.css"), os.path.join(WEB_DIR, "style.css")]:
+        if os.path.exists(p):
+            return FileResponse(p, media_type="text/css")
+    raise HTTPException(status_code=404)
+
+
+@app.get("/app.js")
+def get_js():
+    for p in [os.path.join(APP_DIR, "app.js"), os.path.join(WEB_DIR, "app.js")]:
+        if os.path.exists(p):
+            return FileResponse(p, media_type="application/javascript")
+    raise HTTPException(status_code=404)
+
+
 # Static mounts for local development & fallback
 if os.path.exists(ASSETS_DIR):
     app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")

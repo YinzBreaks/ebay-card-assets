@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CardFlow | Graded Trading Card Dealer Engine</title>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css?v=3">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Navigation & KPI Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-logo">
+          <div class="logo-gem">
+            <span>10</span>
+          </div>
+          <div class="brand-text">
+            <h1>Card<span>Flow</span></h1>
+            <span class="brand-sub">Graded Dealer Engine</span>
+          </div>
+        </div>
+        <div class="ebay-status-pill" id="ebayStatusBtn" title="Click to configure eBay account & business policies">
+          <span class="status-dot online"></span>
+          <span class="status-label">eBay Seller Hub: <strong id="headerAccountName">YinzBreaks</strong></span>
+          <span class="status-cat">Cat #261328</span>
+        </div>
+      </div>
+
+      <!-- Batch Aggregate KPI Metrics -->
+      <div class="batch-kpis">
+        <div class="kpi-card">
+          <span class="kpi-title">Batch Inventory</span>
+          <span class="kpi-val" id="kpiTotalValue">$0.00</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Total Cards</span>
+          <span class="kpi-val" id="kpiTotalCount">0</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Ready / Approved</span>
+          <span class="kpi-val text-emerald" id="kpiApprovedCount">0</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="btn btn-secondary" id="openSettingsBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Policies
+        </button>
+        <button class="btn btn-primary btn-glow" id="exportEbayBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          Export eBay Template
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Content -->
+    <main class="main-content">
+      <!-- Ingestion & Upload Drawer / Panel -->
+      <section class="ingestion-section">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="badge-tag">STEP 1</span>
+            <h2>Ingest Graded Slabs (Dual-Shot or Front & Back)</h2>
+          </div>
+          <div class="upload-mode-toggle">
+            <label class="mode-radio active">
+              <input type="radio" name="uploadMode" value="dual" checked>
+              <span>Dual-Shot (Canvas Split)</span>
+            </label>
+            <label class="mode-radio">
+              <input type="radio" name="uploadMode" value="separate">
+              <span>Separate Front & Back</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="upload-box-wrapper" id="dropZone">
+          <div class="drop-zone-inner" id="dropZoneInner">
+            <div class="drop-icon">
+              <svg width="38" height="38" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+            </div>
+            <div class="drop-text">
+              <h3>Drop card slab photos here, or <span class="browse-link">browse files</span></h3>
+              <p class="drop-hint">Supports dual-shot photos (auto 50/50 canvas split) or front/back pairs. Auto-detects PSA QR/barcode.</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/jpeg,image/png" style="display: none;">
+            <input type="file" id="frontInput" accept="image/jpeg,image/png" style="display: none;">
+            <input type="file" id="backInput" accept="image/jpeg,image/png" style="display: none;">
+          </div>
+
+          <!-- Quick Slab Meta Extractor Fields (Optional Overrides) -->
+          <div class="quick-meta-bar">
+            <div class="meta-field">
+              <label>Grader</label>
+              <select id="quickGrader">
+                <option value="PSA" selected>PSA</option>
+                <option value="BGS">BGS (Beckett)</option>
+                <option value="CGC">CGC</option>
+                <option value="SGC">SGC</option>
+              </select>
+            </div>
+            <div class="meta-field">
+              <label>Grade</label>
+              <select id="quickGrade">
+                <option value="10" selected>10 (Gem Mint)</option>
+                <option value="9.5">9.5 (Mint+)</option>
+                <option value="9">9 (Mint)</option>
+                <option value="8.5">8.5 (NM-MT+)</option>
+                <option value="8">8 (NM-MT)</option>
+              </select>
+            </div>
+            <div class="meta-field meta-flex">
+              <label>Title / Player (Optional manual override)</label>
+              <input type="text" id="quickTitle" placeholder="e.g. 2024-25 Select Erling Haaland Field Level /125">
+            </div>
+            <div class="meta-field">
+              <label>Base Comp ($)</label>
+              <input type="number" id="quickBasePrice" placeholder="Auto" step="0.01">
+            </div>
+            <button class="btn btn-primary" id="processUploadBtn">
+              <span>Process & Comp</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Batch Dealer Table Section -->
+      <section class="dealer-table-section">
+        <div class="table-toolbar">
+          <div class="toolbar-left">
+            <div class="search-box">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input type="text" id="tableSearch" placeholder="Filter by player, SKU, set, cert #...">
+            </div>
+            <div class="filter-pills">
+              <button class="pill active" data-filter="all">All Cards</button>
+              <button class="pill" data-filter="APPROVED">Approved (<span id="countApproved">0</span>)</button>
+              <button class="pill" data-filter="CHALLENGED">Challenged (<span id="countChallenged">0</span>)</button>
+              <button class="pill" data-filter="COMPED">Pending Review (<span id="countComped">0</span>)</button>
+            </div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-outline btn-sm" id="selectAllBtn">Select All</button>
+            <button class="btn btn-outline-success btn-sm" id="approveSelectedBtn">Approve Selected</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="card-grid-table">
+            <thead>
+              <tr>
+                <th width="40"><input type="checkbox" id="masterCheckbox"></th>
+                <th width="80">Slab</th>
+                <th width="220">Custom Label (SKU)</th>
+                <th>Card Details & Comps Justification</th>
+                <th width="110">Grade</th>
+                <th width="120">List Price (BIN)</th>
+                <th width="110">Auto-Accept</th>
+                <th width="110">Min Floor</th>
+                <th width="110">Status</th>
+                <th width="160">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="cardTableBody">
+              <!-- Dynamically rendered card rows -->
+            </tbody>
+          </table>
+          <div class="table-empty-state" id="tableEmptyState" style="display: none;">
+            <p>No cards match your filter criteria.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- INSPECT & CHALLENGE COMP MODAL -->
+  <div class="modal-backdrop" id="challengeModal">
+    <!-- Floating Backdrop Navigation Buttons -->
+    <button class="floating-nav-btn floating-prev" id="floatingPrevCardBtn" title="Previous Record (← key)">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button class="floating-nav-btn floating-next" id="floatingNextCardBtn" title="Next Record (→ key)">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+
+    <div class="modal-drawer">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-tag-row">
+            <span class="badge-tag">INSPECT & CHALLENGE</span>
+            <div class="modal-nav-controls">
+              <button class="nav-arrow-btn" id="modalPrevCardBtn" title="Previous Record (← key)">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <span class="nav-counter-pill" id="modalNavCounter">Card 1 of 18</span>
+              <button class="nav-arrow-btn" id="modalNextCardBtn" title="Next Record (→ key)">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+              </button>
+              <span class="keyboard-nav-hint"><kbd>←</kbd> <kbd>→</kbd></span>
+            </div>
+          </div>
+          <h2 id="modalCardTitle">2022-23 Panini Donruss FIFA Alejandro Garnacho</h2>
+        </div>
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Left: Interactive 3D Flip Card Component -->
+        <div class="modal-col-left">
+          <div class="flip-card-viewport">
+            <div class="flip-card-inner" id="modalFlipCard">
+              <div class="flip-card-front">
+                <img id="modalFrontImg" src="" alt="Card Front">
+                <span class="flip-tag">FRONT</span>
+              </div>
+              <div class="flip-card-back">
+                <img id="modalBackImg" src="" alt="Card Back">
+                <span class="flip-tag">BACK</span>
+              </div>
+            </div>
+          </div>
+          <div class="flip-controls">
+            <button class="btn btn-secondary btn-sm" id="flipToggleBtn">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Flip Slab (Front / Back)
+            </button>
+            <span class="flip-hint">Click card or button to inspect reverse scan</span>
+          </div>
+
+          <div class="sku-display-box">
+            <label>Custom Label (SKU)</label>
+            <div class="sku-code" id="modalSkuCode">MUN-GARNACHO-199-PSA10</div>
+            <div class="cert-code" id="modalCertCode">Cert #101889066 • PSA Gem Mint 10</div>
+          </div>
+        </div>
+
+        <!-- Right: Valuation Engine, Comps Table & Challenge Prompt -->
+        <div class="modal-col-right">
+          <!-- Valuation Justification Rationale Box -->
+          <div class="rationale-box">
+            <div class="rationale-header">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span>Valuation Logic & Comp Justification</span>
+            </div>
+            <p id="modalJustificationText" class="rationale-text"></p>
+          </div>
+
+          <!-- Recent Historical Comps Table -->
+          <div class="comps-table-wrap">
+            <h4>Recent Comparable Sales</h4>
+            <table class="comps-table">
+              <thead>
+                <tr>
+                  <th>Platform</th>
+                  <th>Date</th>
+                  <th>Grade</th>
+                  <th style="text-align: right;">Sale Price</th>
+                </tr>
+              </thead>
+              <tbody id="modalCompsBody">
+                <!-- Comps populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Challenge Prompt & Pricing Overrides -->
+          <div class="challenge-editor-wrap">
+            <div class="challenge-header">
+              <h4>Challenge This Comp</h4>
+              <span class="challenge-sub">Submit feedback or enter manual prices to re-evaluate floors</span>
+            </div>
+
+            <textarea id="challengeFeedback" placeholder="e.g. This is a serial numbered /25 Pink parallel, not the unnumbered base. High demand rookie piece. Bump price 20%."></textarea>
+
+            <div class="quick-chips">
+              <button class="chip" data-text="+15% Serial Numbered / Low Print">+15% Serial Numbered</button>
+              <button class="chip" data-text="+10% High Demand Star">+10% Star Player</button>
+              <button class="chip" data-text="-10% Liquidation Pricing">-10% Quick Sale</button>
+              <button class="chip" data-text="Comp was raw, card is PSA 10">PSA 10 Premium</button>
+            </div>
+
+            <!-- Floor & Price Override Controls -->
+            <div class="override-grid">
+              <div class="override-field">
+                <label>List Price (BIN)</label>
+                <div class="input-dollar">
+                  <span>$</span>
+                  <input type="number" id="modalListPrice" step="0.01">
+                </div>
+              </div>
+              <div class="override-field">
+                <label>Auto-Accept (85%)</label>
+                <div class="input-dollar">
+                  <span>$</span>
+                  <input type="number" id="modalAutoAccept" step="0.01">
+                </div>
+              </div>
+              <div class="override-field">
+                <label>Min Floor (75%)</label>
+                <div class="input-dollar">
+                  <span>$</span>
+                  <input type="number" id="modalMinOffer" step="0.01">
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer-actions">
+              <button class="btn btn-secondary" id="applyChallengeBtn">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Recalculate with Challenge
+              </button>
+              <button class="btn btn-success" id="modalApproveBtn">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Approve & Save Pricing
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT SUMMARY MODAL -->
+  <div class="modal-backdrop" id="exportModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="badge-tag tag-emerald">READY TO UPLOAD</span>
+          <h2>Generated eBay Category Bulk Template</h2>
+        </div>
+        <button class="modal-close" id="closeExportModalBtn">&times;</button>
+      </div>
+      <div class="modal-card-content">
+        <div class="export-stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">Total Listings</span>
+            <span class="stat-val" id="exportTotalCount">19</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Total Inventory Value</span>
+            <span class="stat-val" id="exportTotalValue">$4,124.90</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Category Target</span>
+            <span class="stat-val">261328 (Singles)</span>
+          </div>
+        </div>
+
+        <div class="export-policy-summary">
+          <h4>Pre-Populated Business Policies:</h4>
+          <ul>
+            <li><strong>Shipping:</strong> <span id="exportShipping">Flat: USPSParcel $5.00</span></li>
+            <li><strong>Returns:</strong> <span id="exportReturns">Returns (ID: 255419358020)</span></li>
+            <li><strong>Payments:</strong> <span id="exportPayments">Payment Policy (ID: 255419355020)</span></li>
+            <li><strong>Photo URLs:</strong> Validated pipe-delimited CDN endpoints</li>
+          </ul>
+        </div>
+
+        <div class="download-actions">
+          <a class="btn btn-primary btn-lg" id="downloadCsvBtn" href="/api/download/eBay_Bulk_Upload_Completed.csv" download>
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Download eBay CSV (Recommended)
+          </a>
+          <a class="btn btn-secondary btn-lg" id="downloadXlsxBtn" href="/api/download/eBay_Bulk_Upload_Completed.xlsx" download>
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Download Excel XLSX
+          </a>
+        </div>
+
+        <div class="hub-link-banner">
+          <p>Ready for upload? Open eBay Seller Hub Reports to submit your CSV:</p>
+          <a href="https://www.ebay.com/sh/reports/uploads" target="_blank" class="btn-link">Open eBay Seller Hub Reports Uploads &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="badge-tag">SETTINGS</span>
+          <h2>eBay Account & Business Policies</h2>
+        </div>
+        <button class="modal-close" id="closeSettingsModalBtn">&times;</button>
+      </div>
+      <div class="modal-card-content">
+        <div class="form-group">
+          <label>eBay Account User ID</label>
+          <input type="text" id="settingAccount" value="YinzBreaks">
+        </div>
+        <div class="form-group">
+          <label>Shipping Profile Name</label>
+          <input type="text" id="settingShipping" value="Flat: USPSParcel $5.00, 2 business days (255602283020) - (ID: 255602283020)">
+        </div>
+        <div class="form-group">
+          <label>Return Profile Name</label>
+          <input type="text" id="settingReturns" value="Returns - (ID: 255419358020)">
+        </div>
+        <div class="form-group">
+          <label>Payment Profile Name</label>
+          <input type="text" id="settingPayments" value="Payment Policy - (ID: 255419355020)">
+        </div>
+        <div class="form-group">
+          <label>Item Location</label>
+          <input type="text" id="settingLocation" value="Bethlehem PA">
+        </div>
+        <div class="form-group">
+          <label>Public CDN Base URL</label>
+          <input type="text" id="settingCdn" value="https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main">
+        </div>
+        <button class="btn btn-primary" id="saveSettingsBtn" style="width: 100%;">Save Policy Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=3"></script>
+</body>
+</html>
