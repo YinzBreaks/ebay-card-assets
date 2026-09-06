@@ -1,0 +1,12 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Generated Excel templates & large workbooks
+*.xlsx
+
+# Temporary / upload response logs & generated output
+eBay_Bulk_Upload_Completed.csv
+eBay_Bulk_Upload_Completed-*.csv
+*.log
