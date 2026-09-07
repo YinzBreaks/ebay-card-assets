@@ -1,4 +1,5 @@
 import os
+import traceback
 import re
 import csv
 import json
@@ -627,6 +628,31 @@ async def add_no_cache_headers(request, call_next):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "status": "error",
+            "error_type": type(exc).__name__,
+            "error_message": str(exc),
+            "traceback": traceback.format_exc()
+        }
+    )
+
+
+@app.get("/api/debug")
+def debug_info():
+    import sys
+    return {
+        "python": sys.version,
+        "cv2": cv2 is not None,
+        "pyzbar": pyzbar is not None,
+        "tmp_writable": os.access("/tmp", os.W_OK)
+    }
+
 
 
 class ChallengeRequest(BaseModel):
