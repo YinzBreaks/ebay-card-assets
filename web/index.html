@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css?v=3">
+  <!-- Barcode scanner for auto-decoding PSA/BGS certs in-browser -->
+  <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 </head>
 <body>
   <div class="app-layout">
@@ -298,9 +300,57 @@
             <p id="modalJustificationText" class="rationale-text"></p>
           </div>
 
+          <!-- Card Identity & Slab Data Editor -->
+          <div class="card-identity-editor" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--psa-gold); letter-spacing: 0.5px;">Card Identity & Slab Data</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Edit fields to re-calibrate listing</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px;">
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Card Title</label>
+                <input type="text" id="modalEditTitle" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Player / Subject</label>
+                <input type="text" id="modalEditPlayer" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 8px;">
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Set & Brand</label>
+                <input type="text" id="modalEditSet" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Card #</label>
+                <input type="text" id="modalEditCardNum" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">PSA Cert #</label>
+                <input type="text" id="modalEditCert" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px;">Base Comp ($)</label>
+                <input type="number" id="modalEditBaseComp" step="0.01" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+              </div>
+            </div>
+          </div>
+
           <!-- Recent Historical Comps Table -->
           <div class="comps-table-wrap">
-            <h4>Recent Comparable Sales</h4>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <h4>Recent Comparable Sales</h4>
+              <div style="display: flex; gap: 8px;">
+                <a id="modalEbaySoldLink" href="https://www.ebay.com/sch/i.html?_nkw=psa+10&LH_Sold=1&LH_Complete=1" target="_blank" class="btn btn-secondary btn-xs" style="text-decoration: none; font-size: 11px; padding: 5px 10px; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  Search eBay Sold Comps ↗
+                </a>
+                <a id="modal130PointLink" href="https://130point.com/cards/" target="_blank" class="btn btn-secondary btn-xs" style="text-decoration: none; font-size: 11px; padding: 5px 10px; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  130Point Comps ↗
+                </a>
+              </div>
+            </div>
             <table class="comps-table">
               <thead>
                 <tr>

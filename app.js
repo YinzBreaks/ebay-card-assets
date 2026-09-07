@@ -455,9 +455,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modalSkuCode.textContent = card.sku;
     modalCertCode.textContent = `Cert #${card.cert_number || 'N/A'} • ${card.grader || 'PSA'} Grade ${card.grade || '10'}`;
 
-    const frontSrc = card.front_thumb || ((card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
+    // High-resolution original photo priority (never blurry thumbnail)
+    const frontSrc = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
       ? card.front_url
-      : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`);
+      : (card.front_thumb || `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`);
     const backSrc = (card.back_url && !card.back_url.endsWith(`/${card.sku}.jpg`))
       ? card.back_url
       : (card.front_thumb || `/assets/9_6_28_upload/${card.sku}-BACK.jpg`);
@@ -477,6 +478,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     modalJustificationText.textContent = card.justification || "Market comps verified from recent historical sales.";
+
+    // Populate editable card identity inputs
+    const editTitle = document.getElementById("modalEditTitle");
+    const editPlayer = document.getElementById("modalEditPlayer");
+    const editSet = document.getElementById("modalEditSet");
+    const editCardNum = document.getElementById("modalEditCardNum");
+    const editCert = document.getElementById("modalEditCert");
+    const editBaseComp = document.getElementById("modalEditBaseComp");
+    const ebayLink = document.getElementById("modalEbaySoldLink");
+    const p130Link = document.getElementById("modal130PointLink");
+
+    if (editTitle) editTitle.value = card.title || "";
+    if (editPlayer) editPlayer.value = card.player || "";
+    if (editSet) editSet.value = card.set || "";
+    if (editCardNum) editCardNum.value = card.card_number || "";
+    if (editCert) editCert.value = card.cert_number || "";
+    if (editBaseComp) editBaseComp.value = parseFloat(card.base_comp || (card.list_price / 1.15)).toFixed(2);
+
+    const cleanSearchQuery = (card.title || `${card.set || ''} ${card.player || ''} ${card.card_number || ''} ${card.grader || 'PSA'} ${card.grade || '10'}`).replace(/[^\w\s#/-]/g, ' ').trim();
+    if (ebayLink) ebayLink.href = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(cleanSearchQuery)}&LH_Sold=1&LH_Complete=1`;
+    if (p130Link) p130Link.href = `https://130point.com/cards/`;
 
     modalListPrice.value = parseFloat(card.list_price || 0).toFixed(2);
     modalAutoAccept.value = parseFloat(card.auto_accept || 0).toFixed(2);
@@ -561,29 +583,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Close modal when clicking backdrop outside drawer
-  challengeModal.addEventListener("click", (e) => {
-    if (e.target === challengeModal) {
-      closeChallengeModal();
-    }
-  });
-
-  // 3D Flip Card Action
+  // 3D Flip Card interaction
   modalFlipCard.addEventListener("click", () => {
     modalFlipCard.classList.toggle("flipped");
   });
-  flipToggleBtn.addEventListener("click", () => {
-    modalFlipCard.classList.toggle("flipped");
-  });
+
+  if (flipToggleBtn) {
+    flipToggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      modalFlipCard.classList.toggle("flipped");
+    });
+  }
 
   closeModalBtn.addEventListener("click", closeChallengeModal);
+  challengeModal.addEventListener("click", (e) => {
+    if (e.target === challengeModal) closeChallengeModal();
+  });
 
-  // Quick Chips
+  // Quick Chips logic
   quickChips.forEach(chip => {
     chip.addEventListener("click", () => {
       const text = chip.dataset.text;
       if (challengeFeedback.value) {
-        challengeFeedback.value += ` | ${text}`;
+        challengeFeedback.value += ` • ${text}`;
       } else {
         challengeFeedback.value = text;
       }
@@ -605,6 +627,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const mAuto = parseFloat(modalAutoAccept.value) || null;
     const mMin = parseFloat(modalMinOffer.value) || null;
 
+    const editTitle = document.getElementById("modalEditTitle")?.value.trim();
+    const editPlayer = document.getElementById("modalEditPlayer")?.value.trim();
+    const editSet = document.getElementById("modalEditSet")?.value.trim();
+    const editCardNum = document.getElementById("modalEditCardNum")?.value.trim();
+    const editCert = document.getElementById("modalEditCert")?.value.trim();
+    const editBaseComp = parseFloat(document.getElementById("modalEditBaseComp")?.value) || null;
+
+    if (editTitle) currentCard.title = editTitle;
+    if (editPlayer) currentCard.player = editPlayer;
+    if (editSet) currentCard.set = editSet;
+    if (editCardNum) currentCard.card_number = editCardNum;
+    if (editCert) currentCard.cert_number = editCert;
+    if (editBaseComp) currentCard.base_comp = editBaseComp;
+
     try {
       const res = await fetch("/api/challenge", {
         method: "POST",
@@ -614,7 +650,13 @@ document.addEventListener("DOMContentLoaded", () => {
           feedback: feedback,
           manual_list_price: mList,
           manual_auto_accept: mAuto,
-          manual_min_offer: mMin
+          manual_min_offer: mMin,
+          title: editTitle,
+          player: editPlayer,
+          card_set: editSet,
+          card_number: editCardNum,
+          cert_number: editCert,
+          base_comp: editBaseComp
         })
       });
       const data = await res.json();
@@ -624,7 +666,10 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCard.min_offer = data.card.min_offer;
         currentCard.justification = data.card.justification;
         currentCard.status = "CHALLENGED";
+        if (data.card.title) currentCard.title = data.card.title;
+        if (data.card.player) currentCard.player = data.card.player;
 
+        modalCardTitle.textContent = currentCard.title;
         modalJustificationText.textContent = currentCard.justification;
         modalListPrice.value = currentCard.list_price.toFixed(2);
         modalAutoAccept.value = currentCard.auto_accept.toFixed(2);
@@ -645,6 +690,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const mAuto = parseFloat(modalAutoAccept.value) || currentCard.auto_accept;
     const mMin = parseFloat(modalMinOffer.value) || currentCard.min_offer;
 
+    const editTitle = document.getElementById("modalEditTitle")?.value.trim();
+    const editPlayer = document.getElementById("modalEditPlayer")?.value.trim();
+    const editSet = document.getElementById("modalEditSet")?.value.trim();
+    const editCardNum = document.getElementById("modalEditCardNum")?.value.trim();
+    const editCert = document.getElementById("modalEditCert")?.value.trim();
+    const editBaseComp = parseFloat(document.getElementById("modalEditBaseComp")?.value) || null;
+
+    if (editTitle) currentCard.title = editTitle;
+    if (editPlayer) currentCard.player = editPlayer;
+    if (editSet) currentCard.set = editSet;
+    if (editCardNum) currentCard.card_number = editCardNum;
+    if (editCert) currentCard.cert_number = editCert;
+    if (editBaseComp) currentCard.base_comp = editBaseComp;
+
     currentCard.list_price = mList;
     currentCard.auto_accept = mAuto;
     currentCard.min_offer = mMin;
@@ -658,7 +717,13 @@ document.addEventListener("DOMContentLoaded", () => {
         feedback: challengeFeedback.value.trim(),
         manual_list_price: mList,
         manual_auto_accept: mAuto,
-        manual_min_offer: mMin
+        manual_min_offer: mMin,
+        title: editTitle,
+        player: editPlayer,
+        card_set: editSet,
+        card_number: editCardNum,
+        cert_number: editCert,
+        base_comp: editBaseComp
       })
     });
 
@@ -995,6 +1060,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (quickBasePrice.value && uploadQueue.length === 1) {
         formData.append("base_price", quickBasePrice.value);
+      }
+
+      const rawName = (item.file?.name || item.front?.name || item.name || "");
+      const certMatch = rawName.match(/(?:PSA[-_]?)?(\d{7,10})/i);
+      if (certMatch) {
+        formData.append("cert_number", certMatch[1]);
       }
 
       try {
