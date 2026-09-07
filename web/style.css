@@ -1576,3 +1576,498 @@ body {
   color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
+
+/* ==========================================================================
+   MOBILE RESPONSIVE & MOBILE-FIRST DEALER SYSTEM
+   ========================================================================== */
+
+.mobile-drop-cta {
+  display: none;
+  gap: 10px;
+  margin-top: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mobile-camera-btn, .mobile-browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.mobile-camera-btn {
+  background: linear-gradient(135deg, var(--accent-gold), #d97706);
+  color: #000;
+  border: none;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Mobile Bottom Navigation Bar */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  z-index: 900;
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10px;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px;
+}
+
+.mobile-nav-item svg {
+  transition: transform 0.2s ease, stroke 0.2s ease;
+}
+
+.mobile-nav-item.active {
+  color: var(--accent-gold);
+}
+
+.mobile-nav-item.active svg {
+  stroke: var(--accent-gold);
+  transform: translateY(-2px);
+}
+
+/* Mobile Cards Container */
+.mobile-cards-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.dealer-mobile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dealer-mobile-card:active {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.mobile-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.mobile-slab-thumb-wrap {
+  width: 58px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: #000;
+  position: relative;
+  cursor: pointer;
+}
+
+.mobile-slab-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobile-card-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-sku-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.mobile-sku {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-badges {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.mobile-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mobile-card-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.mobile-pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-price-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobile-price-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.mobile-price-input {
+  width: 100%;
+  height: 36px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.mobile-price-input:focus {
+  border-color: var(--accent-gold);
+  outline: none;
+  background: #0f172a;
+}
+
+.mobile-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-action-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   TABLET & DESKTOP RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-kpis {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+}
+
+@media (max-width: 992px) {
+  .app-layout {
+    padding: 12px;
+  }
+  .ingestion-section {
+    padding: 16px;
+  }
+  .upload-meta-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dealer-table-section {
+    padding: 14px;
+  }
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+  .modal-col-left {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+/* ==========================================================================
+   MOBILE SCREEN BREAKPOINT (<= 768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: calc(75px + env(safe-area-inset-bottom));
+  }
+
+  .app-layout {
+    padding: 8px 10px;
+    gap: 12px;
+  }
+
+  /* Header adjustments */
+  .app-header {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .header-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .brand-text h1 {
+    font-size: 18px;
+  }
+
+  .ebay-status-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .status-cat {
+    display: none;
+  }
+
+  .header-kpis {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px 0 6px;
+    width: 100%;
+  }
+
+  .header-kpis::-webkit-scrollbar {
+    display: none;
+  }
+
+  .kpi-card {
+    min-width: 115px;
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .kpi-val {
+    font-size: 15px;
+  }
+
+  .header-right {
+    display: none; /* Accessible via bottom nav and mobile quick actions */
+  }
+
+  /* Ingestion Dropzone on Mobile */
+  .ingestion-section {
+    padding: 12px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .upload-box-wrapper {
+    padding: 16px 12px;
+  }
+
+  .drop-text h3 {
+    font-size: 14px;
+  }
+
+  .drop-hint {
+    font-size: 11px;
+    display: none;
+  }
+
+  .mobile-drop-cta {
+    display: flex;
+  }
+
+  .upload-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Table Toolbar */
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .toolbar-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filter-pills {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toolbar-right {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  /* Mobile Bottom Navigation */
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  /* Mobile Card Layout vs Table */
+  .table-container {
+    display: none; /* Hidden by default on mobile unless toggled */
+  }
+
+  .mobile-cards-container {
+    display: grid;
+  }
+
+  /* Full Screen / Bottom Sheet Modals on Mobile */
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-card, .modal-card-wide {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 94vh;
+    height: 94vh;
+    border-radius: 20px 20px 0 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-col-left {
+    padding: 14px;
+  }
+
+  .flip-card-viewport {
+    width: 220px;
+    height: 310px;
+  }
+
+  .modal-col-right {
+    padding: 14px;
+  }
+
+  .floating-nav-btn {
+    display: none; /* Replaced by in-modal touch navigation */
+  }
+
+  /* Sales Ledger Modal Mobile */
+  .ledger-stats-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .ledger-table-wrap {
+    padding: 0 12px 14px;
+  }
+
+  .l-stat-val {
+    font-size: 16px;
+  }
+}
+

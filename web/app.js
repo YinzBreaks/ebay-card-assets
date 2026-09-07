@@ -75,6 +75,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const uploadProgressBar = document.getElementById("uploadProgressBar");
   const uploadProgressText = document.getElementById("uploadProgressText");
 
+  // Mobile-Optimized Elements
+  const mobileCardsContainer = document.getElementById("mobileCardsContainer");
+  const tableContainer = document.getElementById("tableContainer");
+  const viewToggleBtn = document.getElementById("viewToggleBtn");
+  const viewToggleIcon = document.getElementById("viewToggleIcon");
+  const viewToggleText = document.getElementById("viewToggleText");
+  const mobileCameraBtn = document.getElementById("mobileCameraBtn");
+  const mobileBrowseBtn = document.getElementById("mobileBrowseBtn");
+  const cameraInput = document.getElementById("cameraInput");
+  const mNavScan = document.getElementById("mNavScan");
+  const mNavInventory = document.getElementById("mNavInventory");
+  const mNavLedger = document.getElementById("mNavLedger");
+  const mNavExport = document.getElementById("mNavExport");
+
   // Challenge Modal Elements
   const challengeModal = document.getElementById("challengeModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
@@ -445,6 +459,176 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       cardTableBody.appendChild(tr);
+    });
+
+    renderMobileCards();
+    updateViewDisplay();
+  }
+
+  // --- Mobile Dealer Cards View System ---
+  let currentViewMode = localStorage.getItem("cardflow_view_mode") || (window.innerWidth <= 768 ? "cards" : "table");
+
+  function updateViewDisplay() {
+    if (!tableContainer || !mobileCardsContainer) return;
+    if (currentViewMode === "cards") {
+      tableContainer.style.display = "none";
+      mobileCardsContainer.style.display = "grid";
+      if (viewToggleText) viewToggleText.textContent = "Table";
+      if (viewToggleIcon) viewToggleIcon.textContent = "📊";
+    } else {
+      tableContainer.style.display = "block";
+      mobileCardsContainer.style.display = "none";
+      if (viewToggleText) viewToggleText.textContent = "Cards";
+      if (viewToggleIcon) viewToggleIcon.textContent = "📇";
+    }
+  }
+
+  if (viewToggleBtn) {
+    viewToggleBtn.addEventListener("click", () => {
+      currentViewMode = currentViewMode === "cards" ? "table" : "cards";
+      localStorage.setItem("cardflow_view_mode", currentViewMode);
+      updateViewDisplay();
+    });
+  }
+
+  window.addEventListener("resize", () => {
+    // Only auto-switch if user hasn't explicitly toggled recently
+    if (!localStorage.getItem("cardflow_view_mode")) {
+      currentViewMode = window.innerWidth <= 768 ? "cards" : "table";
+      updateViewDisplay();
+    }
+  });
+
+  function renderMobileCards() {
+    if (!mobileCardsContainer) return;
+    const filtered = getFilteredCards();
+    mobileCardsContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      mobileCardsContainer.innerHTML = `<div class="table-empty-state"><p>No cards match your filter criteria.</p></div>`;
+      return;
+    }
+
+    filtered.forEach(card => {
+      const cardEl = document.createElement("div");
+      cardEl.className = "dealer-mobile-card";
+      cardEl.dataset.sku = card.sku;
+
+      const isChecked = selectedSkus.has(card.sku);
+      const gradeStr = String(card.grade || "10");
+      let gradeBadgeClass = "badge-psa-10";
+      if (gradeStr.includes("9")) gradeBadgeClass = "badge-psa-9";
+      if (String(card.grader || "").toUpperCase().includes("BGS")) gradeBadgeClass = "badge-bgs";
+
+      const frontImg = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
+        ? card.front_url
+        : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`;
+
+      const alphaBadgeHtml = card.alpha_boost ? `
+        <span class="badge-alpha-boost" title="${card.alpha_justification?.join(' • ') || 'House Alpha rule applied'}">
+          ⚡ ALPHA BOOST
+        </span>
+      ` : "";
+
+      cardEl.innerHTML = `
+        <div class="mobile-card-header">
+          <div class="mobile-slab-thumb-wrap" title="Tap to flip and inspect slab">
+            <img src="${frontImg}" alt="${card.sku}" onerror="if (this.src.indexOf('-FRONT') !== -1) { this.src = '/assets/9_6_28_upload/${card.sku}.jpg'; }">
+          </div>
+          <div class="mobile-card-meta">
+            <div class="mobile-sku-row">
+              <span class="mobile-sku">${card.sku}</span>
+              <div class="mobile-badges">
+                <span class="grade-badge ${gradeBadgeClass}">${card.grader || 'PSA'} ${card.grade || '10'}</span>
+                <span class="status-tag ${card.status}">${card.status}</span>
+              </div>
+            </div>
+            <div class="mobile-card-title">${card.title}</div>
+            <div class="mobile-card-sub">
+              <span>${card.player || 'Athlete'} • Cert #${card.cert_number || 'N/A'}</span>
+            </div>
+            ${alphaBadgeHtml}
+          </div>
+        </div>
+
+        <div class="justification-snippet" style="font-size: 11px;">
+          💡 ${card.justification || 'Market comp verified.'}
+        </div>
+
+        <div class="mobile-pricing-grid">
+          <div class="mobile-price-chip">
+            <span class="mobile-price-label">List Price (BIN)</span>
+            <input type="number" class="mobile-price-input" data-field="list_price" value="${parseFloat(card.list_price || 0).toFixed(2)}" step="0.01">
+          </div>
+          <div class="mobile-price-chip">
+            <span class="mobile-price-label">Auto-Accept</span>
+            <input type="number" class="mobile-price-input" data-field="auto_accept" value="${parseFloat(card.auto_accept || 0).toFixed(2)}" step="0.01">
+          </div>
+          <div class="mobile-price-chip">
+            <span class="mobile-price-label">Min Floor</span>
+            <input type="number" class="mobile-price-input" data-field="min_offer" value="${parseFloat(card.min_offer || 0).toFixed(2)}" step="0.01">
+          </div>
+        </div>
+
+        <div class="mobile-card-actions">
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
+            <input type="checkbox" class="mobile-card-checkbox" ${isChecked ? "checked" : ""}>
+            <span>Select</span>
+          </label>
+          <div class="mobile-action-btn-group">
+            <button type="button" class="btn btn-secondary btn-sm mobile-inspect-btn">Inspect</button>
+            <button type="button" class="btn btn-success btn-sm mobile-approve-btn">✓ Approve</button>
+            <button type="button" class="btn btn-outline btn-sm mobile-delete-btn">✕</button>
+          </div>
+        </div>
+      `;
+
+      // Wire up card interactions
+      const thumb = cardEl.querySelector(".mobile-slab-thumb-wrap");
+      const inspectBtn = cardEl.querySelector(".mobile-inspect-btn");
+      [thumb, inspectBtn].forEach(el => el.addEventListener("click", () => openChallengeModal(card)));
+
+      const approveBtn = cardEl.querySelector(".mobile-approve-btn");
+      approveBtn.addEventListener("click", () => approveSingleCard(card.sku));
+
+      const deleteBtn = cardEl.querySelector(".mobile-delete-btn");
+      deleteBtn.addEventListener("click", () => deleteSingleCard(card.sku));
+
+      const chk = cardEl.querySelector(".mobile-card-checkbox");
+      chk.addEventListener("change", (e) => {
+        if (e.target.checked) selectedSkus.add(card.sku);
+        else selectedSkus.delete(card.sku);
+      });
+
+      const priceInputs = cardEl.querySelectorAll(".mobile-price-input");
+      priceInputs.forEach(input => {
+        input.addEventListener("change", (e) => {
+          const field = e.target.dataset.field;
+          const val = parseFloat(e.target.value) || 0;
+          card[field] = val;
+          if (field === "list_price") {
+            card.auto_accept = parseFloat((val * 0.85).toFixed(2));
+            card.min_offer = parseFloat((val * 0.75).toFixed(2));
+            const autoInp = cardEl.querySelector("input[data-field='auto_accept']");
+            const minInp = cardEl.querySelector("input[data-field='min_offer']");
+            if (autoInp) autoInp.value = card.auto_accept.toFixed(2);
+            if (minInp) minInp.value = card.min_offer.toFixed(2);
+          }
+          updateKPIs();
+          fetch("/api/challenge", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sku: card.sku,
+              manual_list_price: card.list_price,
+              manual_auto_accept: card.auto_accept,
+              manual_min_offer: card.min_offer
+            })
+          });
+        });
+      });
+
+      mobileCardsContainer.appendChild(cardEl);
     });
   }
 
@@ -953,6 +1137,25 @@ document.addEventListener("DOMContentLoaded", () => {
     processUploadBtn.innerHTML = `<span>Process & Comp ${uploadQueue.length} Slab${uploadQueue.length > 1 ? 's' : ''}</span>`;
   }
 
+  // Mobile Camera & File Picker Handlers
+  if (mobileCameraBtn && cameraInput) {
+    mobileCameraBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      cameraInput.click();
+    });
+    cameraInput.addEventListener("change", (e) => {
+      handleFilesSelected(e.target.files);
+      cameraInput.value = "";
+    });
+  }
+
+  if (mobileBrowseBtn && fileInput) {
+    mobileBrowseBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+  }
+
   processUploadBtn.addEventListener("click", async () => {
     if (uploadQueue.length === 0) {
       alert("Please drop or choose card slab images first.");
@@ -1230,6 +1433,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (syncSalesBtn) syncSalesBtn.addEventListener("click", triggerSalesSync);
   if (ledgerSyncSalesBtn) ledgerSyncSalesBtn.addEventListener("click", triggerSalesSync);
+
+  // Mobile Bottom Navigation Handlers
+  if (mNavScan) {
+    mNavScan.addEventListener("click", () => {
+      document.querySelectorAll(".mobile-nav-item").forEach(n => n.classList.remove("active"));
+      mNavScan.classList.add("active");
+      dropZone.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+  if (mNavInventory) {
+    mNavInventory.addEventListener("click", () => {
+      document.querySelectorAll(".mobile-nav-item").forEach(n => n.classList.remove("active"));
+      mNavInventory.classList.add("active");
+      const section = document.querySelector(".dealer-table-section");
+      if (section) section.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+  if (mNavLedger) {
+    mNavLedger.addEventListener("click", () => {
+      document.querySelectorAll(".mobile-nav-item").forEach(n => n.classList.remove("active"));
+      mNavLedger.classList.add("active");
+      if (viewSalesLedgerBtn) viewSalesLedgerBtn.click();
+    });
+  }
+  if (mNavExport) {
+    mNavExport.addEventListener("click", () => {
+      document.querySelectorAll(".mobile-nav-item").forEach(n => n.classList.remove("active"));
+      mNavExport.classList.add("active");
+      if (exportEbayBtn) exportEbayBtn.click();
+    });
+  }
+
+  // Mobile Touch Swipe Navigation for Challenge/Inspect Modal
+  if (challengeModal) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    challengeModal.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    challengeModal.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchEndX - touchStartX;
+      if (Math.abs(diff) > 55) {
+        if (diff > 0) {
+          navigateCard(-1); // Swipe right -> Previous slab
+        } else {
+          navigateCard(1);  // Swipe left -> Next slab
+        }
+      }
+    }, { passive: true });
+  }
 
   // Close modals on clicking outside drawer/card
   window.addEventListener("click", (e) => {
