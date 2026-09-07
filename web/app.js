@@ -145,6 +145,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (settings.payment_profile) settingPayments.value = settings.payment_profile;
       if (settings.location) settingLocation.value = settings.location;
       if (settings.cdn_prefix) settingCdn.value = settings.cdn_prefix;
+
+      const settingEbayAppId = document.getElementById("settingEbayAppId");
+      const settingEbayCertId = document.getElementById("settingEbayCertId");
+      const settingEbayToken = document.getElementById("settingEbayToken");
+      if (settings.ebay_app_id && settingEbayAppId) settingEbayAppId.value = settings.ebay_app_id;
+      if (settings.ebay_cert_id && settingEbayCertId) settingEbayCertId.value = settings.ebay_cert_id;
+      if (settings.ebay_token && settingEbayToken) settingEbayToken.value = settings.ebay_token;
     } catch (err) {
       console.error("Failed to load settings:", err);
     }
@@ -262,6 +269,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const approvedCount = cards.filter(c => c.status === "APPROVED").length;
     const challengedCount = cards.filter(c => c.status === "CHALLENGED").length;
     const compedCount = cards.filter(c => c.status === "COMPED").length;
+    const listedCount = cards.filter(c => c.status === "LISTED").length;
+    const unlistedCount = cards.filter(c => c.status === "UNLISTED").length;
     const soldCount = cards.filter(c => c.status === "SOLD").length;
 
     kpiTotalCount.textContent = totalCount;
@@ -271,6 +280,10 @@ document.addEventListener("DOMContentLoaded", () => {
     countApproved.textContent = approvedCount;
     countChallenged.textContent = challengedCount;
     countComped.textContent = compedCount;
+    const countListedEl = document.getElementById("countListed");
+    const countUnlistedEl = document.getElementById("countUnlisted");
+    if (countListedEl) countListedEl.textContent = listedCount;
+    if (countUnlistedEl) countUnlistedEl.textContent = unlistedCount;
     if (countSold) {
       countSold.textContent = soldCount;
     }
@@ -315,6 +328,8 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => { card._justAdded = false; }, 4000);
       }
 
+      const isListed = (card.status === "LISTED");
+      const isUnlisted = (card.status === "UNLISTED");
       const isChecked = selectedSkus.has(card.sku);
       const gradeStr = String(card.grade || "10");
       let gradeBadgeClass = "badge-psa-10";
@@ -325,8 +340,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ? card.front_url
         : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`);
 
+      let statusTagHtml = `<span class="status-tag ${card.status}">${card.status}</span>`;
+      if (isListed) {
+        statusTagHtml = `<span class="status-tag LISTED" title="Listed on eBay in batch ${card.batch_folder || ''} at ${card.listed_at || ''}">LISTED</span>`;
+      } else if (isUnlisted) {
+        statusTagHtml = `<span class="status-tag UNLISTED" title="Unlisted at ${card.unlisted_at || ''}">UNLISTED</span>`;
+      }
+
+      let actionButtons = `
+        <button class="btn btn-secondary btn-sm inspect-btn" title="Inspect slabs, comps, & lifecycle history">Inspect</button>
+      `;
+      if (isListed) {
+        actionButtons += `<button class="btn btn-outline-warning btn-sm unlist-btn" title="Unlist card from active eBay listings">Unlist</button>`;
+      } else if (isUnlisted) {
+        actionButtons += `<button class="btn btn-outline-success btn-sm relist-btn" title="Relist card for next upload batch">Relist</button>`;
+      } else {
+        actionButtons += `<button class="btn btn-success btn-sm approve-btn" title="Approve listing for eBay export">✓</button>`;
+      }
+      actionButtons += `<button class="btn btn-outline btn-sm delete-btn" title="Remove card">✕</button>`;
+
       tr.innerHTML = `
-        <td><input type="checkbox" class="row-checkbox" ${isChecked ? "checked" : ""}></td>
+        <td><input type="checkbox" class="row-checkbox" ${isChecked ? "checked" : ""} ${isListed ? 'disabled title="Card is already LISTED on eBay in ' + (card.batch_folder || 'active batch') + '. Unlist first before relisting."' : ''}></td>
         <td>
           <div class="slab-thumb-wrap" title="Click to inspect card">
             <img src="${frontImg}" alt="${card.sku}" onerror="if (this.src.indexOf('-FRONT') !== -1) { this.src = '/assets/9_6_28_upload/${card.sku}.jpg'; }">
@@ -334,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </td>
         <td>
           <span class="sku-pill" title="Click to copy SKU">${card.sku}</span>
+          ${card.batch_folder ? `<div style="font-size: 10px; color: #94a3b8; font-family: var(--font-mono); margin-top: 3px;">📁 ${card.batch_folder}</div>` : ''}
         </td>
         <td>
           <div class="card-title-cell">
@@ -344,6 +379,8 @@ document.addEventListener("DOMContentLoaded", () => {
               <span><strong>Cert:</strong> #${card.cert_number || 'N/A'}</span>
               <span>•</span>
               <span><strong>Set:</strong> ${card.set || 'Panini'}</span>
+              <span>•</span>
+              <span><strong>UPC:</strong> Does not apply</span>
             </div>
             <div class="justification-snippet" title="${card.justification || ''}">
               💡 ${card.justification || 'Market valuation verified.'}
@@ -377,33 +414,49 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </td>
         <td>
-          <span class="status-tag ${card.status}">${card.status}</span>
+          ${statusTagHtml}
         </td>
         <td>
           <div class="action-cell">
-            <button class="btn btn-secondary btn-sm inspect-btn" title="Inspect slabs, comps, & challenge pricing">Inspect</button>
-            <button class="btn btn-success btn-sm approve-btn" title="Approve listing for eBay export">✓</button>
-            <button class="btn btn-outline btn-sm delete-btn" title="Remove card">✕</button>
+            ${actionButtons}
           </div>
         </td>
       `;
 
       // Event Listeners for Row
       const chk = tr.querySelector(".row-checkbox");
-      chk.addEventListener("change", (e) => {
-        if (e.target.checked) selectedSkus.add(card.sku);
-        else selectedSkus.delete(card.sku);
-      });
+      if (chk && !chk.disabled) {
+        chk.addEventListener("change", (e) => {
+          if (e.target.checked) selectedSkus.add(card.sku);
+          else selectedSkus.delete(card.sku);
+        });
+      }
 
       const thumb = tr.querySelector(".slab-thumb-wrap");
       const inspectBtn = tr.querySelector(".inspect-btn");
-      [thumb, inspectBtn].forEach(el => el.addEventListener("click", () => openChallengeModal(card)));
+      [thumb, inspectBtn].forEach(el => {
+        if (el) el.addEventListener("click", () => openChallengeModal(card));
+      });
 
       const approveBtn = tr.querySelector(".approve-btn");
-      approveBtn.addEventListener("click", () => approveSingleCard(card.sku));
+      if (approveBtn) {
+        approveBtn.addEventListener("click", () => approveSingleCard(card.sku));
+      }
+
+      const unlistBtn = tr.querySelector(".unlist-btn");
+      if (unlistBtn) {
+        unlistBtn.addEventListener("click", () => unlistCard(card.sku));
+      }
+
+      const relistBtn = tr.querySelector(".relist-btn");
+      if (relistBtn) {
+        relistBtn.addEventListener("click", () => relistCard(card.sku));
+      }
 
       const deleteBtn = tr.querySelector(".delete-btn");
-      deleteBtn.addEventListener("click", () => deleteSingleCard(card.sku));
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => deleteSingleCard(card.sku));
+      }
 
       const skuPill = tr.querySelector(".sku-pill");
       skuPill.addEventListener("click", () => {
@@ -523,6 +576,51 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       modalCompsBody.appendChild(row);
     });
+
+    // Lifecycle Timeline & Actions
+    const timelineList = document.getElementById("modalStatusTimelineList");
+    const lifecycleActions = document.getElementById("modalLifecycleActionBtns");
+    if (timelineList) {
+      timelineList.innerHTML = "";
+      const history = card.status_history || [
+        { status: card.status || "COMPED", timestamp: "Auto-calibrated", note: `Valuation: $${parseFloat(card.list_price || 0).toFixed(2)}` }
+      ];
+      history.forEach(h => {
+        const item = document.createElement("div");
+        item.className = "timeline-item";
+        let badgeColor = "var(--psa-gold)";
+        if (h.status === "LISTED") badgeColor = "#4ade80";
+        else if (h.status === "UNLISTED") badgeColor = "#fb923c";
+        else if (h.status === "APPROVED") badgeColor = "var(--emerald)";
+        else if (h.status === "SOLD") badgeColor = "var(--purple)";
+
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="timeline-badge" style="background: rgba(255,255,255,0.06); color: ${badgeColor}; border: 1px solid ${badgeColor}40;">${h.status}</span>
+            <span style="color: #cbd5e1;">${h.note || (h.batch ? 'Batch: ' + h.batch : 'Status updated')}</span>
+          </div>
+          <span style="color: var(--text-muted); font-size: 10px; font-family: var(--font-mono);">${h.timestamp || ''}</span>
+        `;
+        timelineList.appendChild(item);
+      });
+    }
+
+    if (lifecycleActions) {
+      lifecycleActions.innerHTML = "";
+      if (card.status === "LISTED") {
+        const unlistBtn = document.createElement("button");
+        unlistBtn.className = "btn btn-xs btn-outline-warning";
+        unlistBtn.textContent = "Unlist from eBay";
+        unlistBtn.onclick = () => unlistCard(card.sku);
+        lifecycleActions.appendChild(unlistBtn);
+      } else if (card.status === "UNLISTED") {
+        const relistBtn = document.createElement("button");
+        relistBtn.className = "btn btn-xs btn-outline-success";
+        relistBtn.textContent = "Relist for Next Batch";
+        relistBtn.onclick = () => relistCard(card.sku);
+        lifecycleActions.appendChild(relistBtn);
+      }
+    }
 
     challengeModal.classList.add("open");
   }
@@ -739,6 +837,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Single card approval
+  // Single card approval
   async function approveSingleCard(sku) {
     const card = cards.find(c => c.sku === sku);
     if (!card) return;
@@ -750,6 +849,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     renderTable();
     updateKPIs();
+  }
+
+  // Unlist card from eBay active status
+  async function unlistCard(sku) {
+    try {
+      const res = await fetch(`/api/cards/${sku}/unlist`, { method: "POST" });
+      const data = await res.json();
+      if (data.status === "success") {
+        const target = cards.find(c => c.sku === sku);
+        if (target) {
+          target.status = "UNLISTED";
+          target.unlisted_at = data.card.unlisted_at;
+          target.status_history = data.card.status_history;
+        }
+        selectedSkus.delete(sku);
+        renderTable();
+        updateKPIs();
+        if (currentCard && currentCard.sku === sku) {
+          openChallengeModal(target || data.card);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to unlist card:", err);
+    }
+  }
+
+  // Relist card (moves from UNLISTED -> APPROVED ready for next batch)
+  async function relistCard(sku) {
+    try {
+      const res = await fetch(`/api/cards/${sku}/relist`, { method: "POST" });
+      const data = await res.json();
+      if (data.status === "success") {
+        const target = cards.find(c => c.sku === sku);
+        if (target) {
+          target.status = "APPROVED";
+          target.relisted_at = data.card.relisted_at;
+          target.status_history = data.card.status_history;
+        }
+        renderTable();
+        updateKPIs();
+        if (currentCard && currentCard.sku === sku) {
+          openChallengeModal(target || data.card);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to relist card:", err);
+    }
   }
 
   // Single card delete
@@ -777,21 +923,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Master Checkbox: strictly only checks non-LISTED cards to prevent double listing
   masterCheckbox.addEventListener("change", (e) => {
     const filtered = getFilteredCards();
     if (e.target.checked) {
-      filtered.forEach(c => selectedSkus.add(c.sku));
+      filtered.forEach(c => {
+        if (c.status !== "LISTED") selectedSkus.add(c.sku);
+      });
     } else {
       filtered.forEach(c => selectedSkus.delete(c.sku));
     }
     renderTable();
   });
 
+  // Select All: skips any cards already marked as LISTED
   selectAllBtn.addEventListener("click", () => {
-    cards.forEach(c => selectedSkus.add(c.sku));
+    let skippedListed = 0;
+    cards.forEach(c => {
+      if (c.status !== "LISTED") {
+        selectedSkus.add(c.sku);
+      } else {
+        skippedListed++;
+      }
+    });
     masterCheckbox.checked = true;
     renderTable();
+    if (skippedListed > 0) {
+      console.log(`Protected ${skippedListed} already LISTED cards from selection to prevent double-listing.`);
+    }
   });
+
+  // Select Approved: selects only cards with APPROVED or RELISTED status
+  const selectApprovedBtn = document.getElementById("selectApprovedBtn");
+  if (selectApprovedBtn) {
+    selectApprovedBtn.addEventListener("click", () => {
+      selectedSkus.clear();
+      cards.forEach(c => {
+        if (c.status === "APPROVED" || c.status === "RELISTED") {
+          selectedSkus.add(c.sku);
+        }
+      });
+      masterCheckbox.checked = (selectedSkus.size > 0);
+      renderTable();
+    });
+  }
 
   approveSelectedBtn.addEventListener("click", async () => {
     if (selectedSkus.size === 0) {
@@ -800,7 +975,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const skusToApprove = Array.from(selectedSkus);
     cards.forEach(c => {
-      if (selectedSkus.has(c.sku)) c.status = "APPROVED";
+      if (selectedSkus.has(c.sku) && c.status !== "LISTED") c.status = "APPROVED";
     });
     await fetch("/api/approve", {
       method: "POST",
@@ -1136,8 +1311,29 @@ document.addEventListener("DOMContentLoaded", () => {
         exportReturns.textContent = settings.return_profile || "Returns Policy";
         exportPayments.textContent = settings.payment_profile || "Payment Policy";
 
+        const exportBatchNameTag = document.getElementById("exportBatchNameTag");
+        const exportBatchFolderPath = document.getElementById("exportBatchFolderPath");
+        if (exportBatchNameTag) exportBatchNameTag.textContent = data.batch_name;
+        if (exportBatchFolderPath) exportBatchFolderPath.textContent = data.batch_folder;
+
         downloadCsvBtn.href = data.csv_download_url;
         downloadXlsxBtn.href = data.xlsx_download_url;
+
+        // Mark exported cards as LISTED and record batch_folder
+        const exportedSkusSet = new Set(Array.from(selectedSkus));
+        cards.forEach(c => {
+          if (exportedSkusSet.size === 0 || exportedSkusSet.has(c.sku)) {
+            if (c.status === "APPROVED" || exportedSkusSet.has(c.sku)) {
+              c.status = "LISTED";
+              c.batch_folder = data.batch_name;
+              c.listed_at = data.timestamp;
+              c.upc = "Does not apply";
+            }
+          }
+        });
+        selectedSkus.clear();
+        renderTable();
+        updateKPIs();
 
         exportModal.classList.add("open");
       } else {
@@ -1163,13 +1359,20 @@ document.addEventListener("DOMContentLoaded", () => {
   closeSettingsModalBtn.addEventListener("click", () => settingsModal.classList.remove("open"));
 
   saveSettingsBtn.addEventListener("click", async () => {
+    const settingEbayAppId = document.getElementById("settingEbayAppId");
+    const settingEbayCertId = document.getElementById("settingEbayCertId");
+    const settingEbayToken = document.getElementById("settingEbayToken");
+
     const updated = {
       account_name: settingAccount.value.trim(),
       shipping_profile: settingShipping.value.trim(),
       return_profile: settingReturns.value.trim(),
       payment_profile: settingPayments.value.trim(),
       location: settingLocation.value.trim(),
-      cdn_prefix: settingCdn.value.trim()
+      cdn_prefix: settingCdn.value.trim(),
+      ebay_app_id: settingEbayAppId ? settingEbayAppId.value.trim() : "",
+      ebay_cert_id: settingEbayCertId ? settingEbayCertId.value.trim() : "",
+      ebay_token: settingEbayToken ? settingEbayToken.value.trim() : ""
     };
 
     const res = await fetch("/api/settings", {

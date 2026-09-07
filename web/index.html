@@ -187,12 +187,15 @@
               <button class="pill" data-filter="APPROVED">Approved (<span id="countApproved">0</span>)</button>
               <button class="pill" data-filter="CHALLENGED">Challenged (<span id="countChallenged">0</span>)</button>
               <button class="pill" data-filter="COMPED">Pending Review (<span id="countComped">0</span>)</button>
+              <button class="pill" data-filter="LISTED">Listed (<span id="countListed">0</span>)</button>
+              <button class="pill" data-filter="UNLISTED">Unlisted (<span id="countUnlisted">0</span>)</button>
               <button class="pill" data-filter="SOLD">Sold (<span id="countSold">0</span>)</button>
             </div>
           </div>
           <div class="toolbar-right">
             <button class="btn btn-outline btn-sm" id="selectAllBtn">Select All</button>
-            <button class="btn btn-outline-success btn-sm" id="approveSelectedBtn">Approve Selected</button>
+            <button class="btn btn-outline-success btn-sm" id="selectApprovedBtn">Select Approved</button>
+            <button class="btn btn-primary btn-sm" id="approveSelectedBtn">Approve Selected</button>
           </div>
         </div>
 
@@ -417,6 +420,19 @@
                 Approve & Save Pricing
               </button>
             </div>
+
+            <!-- Lifecycle & Diligent Audit Log Timeline -->
+            <div class="lifecycle-timeline" id="modalLifecycleSection">
+              <div class="timeline-header">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--psa-gold); letter-spacing: 0.5px;">Listing Lifecycle & Audit History</span>
+                <div style="display: flex; gap: 6px;" id="modalLifecycleActionBtns">
+                  <!-- Populated by JS: Unlist or Relist button -->
+                </div>
+              </div>
+              <div class="timeline-list" id="modalStatusTimelineList">
+                <!-- Timeline items populated by JS -->
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -446,6 +462,17 @@
           <div class="stat-box">
             <span class="stat-label">Category Target</span>
             <span class="stat-val">261328 (Singles)</span>
+          </div>
+        </div>
+
+        <div class="batch-folder-banner" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 700; color: #4ade80; text-transform: uppercase;">📁 Batch Asset Folder & Upload Protection</span>
+            <span class="badge-tag tag-emerald" id="exportBatchNameTag">9_7_28_upload</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 6px 0;">All card images have been placed into the dated folder below, and cards are now flagged as <strong style="color: #4ade80;">LISTED</strong> with <code style="color: var(--psa-gold);">P:UPC = Does not apply</code> to strictly prevent double-listing.</p>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <code id="exportBatchFolderPath" style="background: var(--bg-dark); padding: 4px 8px; border-radius: 4px; font-size: 12px; color: var(--psa-gold); border: 1px solid var(--border-color);">assets/9_7_28_upload</code>
           </div>
         </div>
 
@@ -512,6 +539,13 @@
         <div class="form-group">
           <label>Public CDN Base URL</label>
           <input type="text" id="settingCdn" value="https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main">
+        </div>
+        <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
+          <label style="color: var(--psa-gold); font-weight: 700;">eBay Developer API Key (Official TOS-Compliant Comps)</label>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Enter your official eBay Developer App ID / Cert ID or OAuth token for direct Browse API comp queries without any web scraping risk.</p>
+          <input type="text" id="settingEbayAppId" placeholder="App ID (Client ID)" style="margin-bottom: 6px;">
+          <input type="password" id="settingEbayCertId" placeholder="Cert ID (Client Secret)" style="margin-bottom: 6px;">
+          <input type="password" id="settingEbayToken" placeholder="User OAuth / Auth'n'Auth Token (Optional)">
         </div>
         <button class="btn btn-primary" id="saveSettingsBtn" style="width: 100%;">Save Policy Settings</button>
       </div>

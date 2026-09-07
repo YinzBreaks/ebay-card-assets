@@ -91,7 +91,10 @@ DEFAULT_SETTINGS = {
     "account_name": "YinzBreaks",
     "account_connected": True,
     "github_repo": "YinzBreaks/ebay-card-assets",
-    "cdn_prefix": CDN_BASE_URL
+    "cdn_prefix": CDN_BASE_URL,
+    "ebay_app_id": "",
+    "ebay_cert_id": "",
+    "ebay_token": ""
 }
 
 
@@ -676,6 +679,8 @@ class ApproveRequest(BaseModel):
 
 class ExportRequest(BaseModel):
     skus: Optional[List[str]] = None
+    batch_name: Optional[str] = None
+    force_relist: Optional[bool] = False
 
 
 @app.get("/api/settings")
@@ -1470,26 +1475,176 @@ def delete_card(sku: str):
     return {"status": "success", "remaining": len(filtered)}
 
 
+@app.post("/api/cards/{sku}/unlist")
+@app.post("/cards/{sku}/unlist")
+def unlist_card(sku: str):
+    cards = get_cards()
+    target = None
+    for c in cards:
+        if c.get("sku") == sku:
+            target = c
+            break
+
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Card not found with SKU: {sku}")
+
+    target["status"] = "UNLISTED"
+    timestamp_now = time.strftime("%Y-%m-%d %H:%M:%S")
+    target["unlisted_at"] = timestamp_now
+    history = target.setdefault("status_history", [])
+    history.append({
+        "status": "UNLISTED",
+        "timestamp": timestamp_now,
+        "note": "Manually unlisted from active eBay listings"
+    })
+    save_cards(cards)
+    return {"status": "success", "card": target}
+
+
+@app.post("/api/cards/{sku}/relist")
+@app.post("/cards/{sku}/relist")
+def relist_card(sku: str):
+    cards = get_cards()
+    target = None
+    for c in cards:
+        if c.get("sku") == sku:
+            target = c
+            break
+
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Card not found with SKU: {sku}")
+
+    target["status"] = "APPROVED"  # Ready to be queued for next upload batch
+    timestamp_now = time.strftime("%Y-%m-%d %H:%M:%S")
+    target["relisted_at"] = timestamp_now
+    history = target.setdefault("status_history", [])
+    history.append({
+        "status": "RELISTED",
+        "timestamp": timestamp_now,
+        "note": "Card unlocked and re-approved for next upload batch"
+    })
+    save_cards(cards)
+    return {"status": "success", "card": target}
+
+
 @app.post("/api/export")
 @app.post("/export")
 def export_listings(req: ExportRequest):
     """
     Exports approved listings to eBay category template using openpyxl & csv.
-    STRICT CONSTRAINT: NO win32com or Microsoft Excel COM automation in web loop.
+    - Creates dated batch folder (e.g. assets/9_7_28_upload)
+    - Copies front & back images into dated folder
+    - Populates P:UPC with 'Does not apply'
+    - Prevents double-listing by marking cards as LISTED with timestamp & batch
+    - Strictly prevents re-exporting already LISTED cards without explicit unlist/relist
     """
     all_cards = get_cards()
     if req.skus:
         cards_to_export = [c for c in all_cards if c.get("sku") in req.skus]
     else:
-        # Export all approved cards, or all cards if none marked approved
-        approved = [c for c in all_cards if c.get("status") == "APPROVED"]
-        cards_to_export = approved if approved else all_cards
+        # Default: export cards that are APPROVED or RELISTED
+        cards_to_export = [c for c in all_cards if c.get("status") in ["APPROVED", "RELISTED"]]
+        if not cards_to_export:
+            # Fallback to non-listed cards if none explicitly approved
+            cards_to_export = [c for c in all_cards if c.get("status") not in ["LISTED", "SOLD"]]
 
     if not cards_to_export:
-        raise HTTPException(status_code=400, detail="No cards available to export.")
+        raise HTTPException(status_code=400, detail="No cards available to export. Approve cards or unlist/relist existing items.")
+
+    # Double-Listing Prevention Check
+    if not req.force_relist:
+        already_listed = [c for c in cards_to_export if c.get("status") == "LISTED"]
+        if already_listed and len(already_listed) == len(cards_to_export):
+            listed_skus = [c.get("sku") for c in already_listed]
+            raise HTTPException(
+                status_code=400,
+                detail=f"All selected cards are already LISTED ({', '.join(listed_skus)}). To prevent double-listing, unlist them first before relisting."
+            )
+        # Exclude already LISTED cards from this export run to prevent duplicate listings
+        cards_to_export = [c for c in cards_to_export if c.get("status") != "LISTED"]
+
+    if not cards_to_export:
+        raise HTTPException(status_code=400, detail="No eligible cards to export (selected cards are already listed).")
+
+    # Generate dated batch folder: e.g. 9_7_28_upload
+    now = time.localtime()
+    default_batch_name = f"{now.tm_mon}_{now.tm_mday}_{len(cards_to_export)}_upload"
+    batch_name = req.batch_name.strip() if req.batch_name else default_batch_name
+    batch_dir = os.path.join(ASSETS_DIR, batch_name)
+    os.makedirs(batch_dir, exist_ok=True)
 
     settings = load_settings()
     cdn = settings.get("cdn_prefix", CDN_BASE_URL)
+    timestamp_now = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Copy card images into the dated batch folder
+    for c in cards_to_export:
+        sku = c.get("sku", "")
+        front_filename = f"{sku}-FRONT.jpg"
+        back_filename = f"{sku}-BACK.jpg"
+        target_front = os.path.join(batch_dir, front_filename)
+        target_back = os.path.join(batch_dir, back_filename)
+
+        # Search for source images across known asset directories
+        front_sources = [
+            os.path.join(ASSETS_DIR, "9_6_28_upload", front_filename),
+            os.path.join(ASSETS_DIR, "9_6_28_upload", f"{sku}.jpg"),
+            os.path.join(ASSETS_DIR, front_filename),
+            os.path.join(ASSETS_DIR, f"{sku}.jpg"),
+        ]
+        if c.get("front_url") and not c["front_url"].startswith("http"):
+            front_sources.insert(0, os.path.join(APP_DIR, c["front_url"].lstrip("/")))
+
+        for src in front_sources:
+            if os.path.exists(src):
+                try:
+                    shutil.copy2(src, target_front)
+                    break
+                except Exception:
+                    pass
+
+        back_sources = [
+            os.path.join(ASSETS_DIR, "9_6_28_upload", back_filename),
+            os.path.join(ASSETS_DIR, back_filename),
+        ]
+        if c.get("back_url") and not c["back_url"].startswith("http"):
+            back_sources.insert(0, os.path.join(APP_DIR, c["back_url"].lstrip("/")))
+
+        for src in back_sources:
+            if os.path.exists(src):
+                try:
+                    shutil.copy2(src, target_back)
+                    break
+                except Exception:
+                    pass
+
+        # If back image not found, use front copy as fallback
+        if os.path.exists(target_front) and not os.path.exists(target_back):
+            try:
+                shutil.copy2(target_front, target_back)
+            except Exception:
+                pass
+
+        # Update card URLs to reference the new dated batch folder
+        c["front_url"] = f"/assets/{batch_name}/{front_filename}"
+        c["back_url"] = f"/assets/{batch_name}/{back_filename}"
+        c["front_cdn"] = f"{cdn}/assets/{batch_name}/{front_filename}"
+        c["back_cdn"] = f"{cdn}/assets/{batch_name}/{back_filename}"
+        c["status"] = "LISTED"
+        c["listed_at"] = timestamp_now
+        c["batch_folder"] = batch_name
+        c["upc"] = "Does not apply"
+
+        history = c.setdefault("status_history", [])
+        history.append({
+            "status": "LISTED",
+            "timestamp": timestamp_now,
+            "batch": batch_name,
+            "note": f"Exported in dated upload batch {batch_name}"
+        })
+
+    # Save updated cards so LISTED status is immediately persistent
+    save_cards(all_cards)
 
     # Read base template row 4 headers
     openpyxl.styles.fonts.Font.family.max = 100
@@ -1531,7 +1686,7 @@ def export_listings(req: ExportRequest):
     # Final hardcoded standard fallback
     if not headers:
         headers = [
-            "Action", "Custom label (SKU)", "Category ID", "Title", "Buy It Now price", "Quantity",
+            "Action", "Custom label (SKU)", "Category ID", "Title", "P:UPC", "Start price", "Buy It Now price", "Quantity",
             "Item photo URL", "Format", "Duration", "Condition ID", "Best Offer Enabled",
             "Best Offer Auto Accept Price", "Minimum Best Offer Price", "Description", "Card Name",
             "Sport", "Player/Athlete", "Parallel/Variety", "Season", "Manufacturer", "Features",
@@ -1564,6 +1719,7 @@ def export_listings(req: ExportRequest):
     c_cat_id = find_idx('category id')
     c_cat_name = find_idx('category name')
     c_title = find_idx('title')
+    c_upc = find_idx('p:upc', 'upc')
     c_start_price = find_idx('start price')
     c_bin_price = find_idx('buy it now price')
     c_qty = find_idx('quantity')
@@ -1610,27 +1766,19 @@ def export_listings(req: ExportRequest):
         grader_val = GRADER_MAP.get(c.get("grader", "PSA").upper(), "Professional Sports Authenticator (PSA) - (ID: 275010)")
         grade_val = GRADE_MAP.get(str(c.get("grade", "10")), "10 - (ID: 275020)")
 
-        # Prepare Pipe-Delimited CDN URLs: {Front}|{Back}
-        front_url = c.get("front_cdn") or c.get("front_url", "")
-        back_url = c.get("back_cdn") or c.get("back_url", "")
-
-        if not front_url.startswith("http"):
-            clean_front = front_url.split("/")[-1]
-            front_url = f"{cdn}/assets/9_6_28_upload/{clean_front}"
-        if not back_url.startswith("http"):
-            clean_back = back_url.split("/")[-1]
-            back_url = f"{cdn}/assets/9_6_28_upload/{clean_back}"
-
-        if front_url != back_url and back_url:
-            photo_str = f"{front_url}|{back_url}"
-        else:
-            photo_str = front_url
+        # Prepare Pipe-Delimited CDN URLs pointing to the dated batch folder
+        front_filename = f"{sku}-FRONT.jpg"
+        back_filename = f"{sku}-BACK.jpg"
+        front_url = f"{cdn}/assets/{batch_name}/{front_filename}"
+        back_url = f"{cdn}/assets/{batch_name}/{back_filename}"
+        photo_str = f"{front_url}|{back_url}"
 
         if c_action is not None: row[c_action] = "Add"
         if c_sku is not None: row[c_sku] = sku
         if c_cat_id is not None: row[c_cat_id] = int(cat_id)
         if c_cat_name is not None: row[c_cat_name] = cat_name
         if c_title is not None: row[c_title] = title
+        if c_upc is not None: row[c_upc] = "Does not apply"  # Trading card singles standard
         if c_start_price is not None: row[c_start_price] = f"{c.get('list_price', 100.0):.2f}"
         if c_bin_price is not None: row[c_bin_price] = ""  # Strictly blank for FixedPrice
         if c_qty is not None: row[c_qty] = 1
@@ -1663,12 +1811,15 @@ def export_listings(req: ExportRequest):
 
         data_rows.append(row)
 
-    # 1. Write clean CSV
-    output_csv_assets = os.path.join(ASSETS_DIR, "eBay_Bulk_Upload_Completed.csv")
-    output_csv_root = os.path.join(APP_DIR, "eBay_Bulk_Upload_Completed.csv")
-    output_csv_tmp = "/tmp/eBay_Bulk_Upload_Completed.csv"
+    # 1. Write clean CSV to batch directory, assets directory, and root
+    csv_destinations = [
+        os.path.join(batch_dir, "eBay_Bulk_Upload_Completed.csv"),
+        os.path.join(ASSETS_DIR, "eBay_Bulk_Upload_Completed.csv"),
+        os.path.join(APP_DIR, "eBay_Bulk_Upload_Completed.csv"),
+        "/tmp/eBay_Bulk_Upload_Completed.csv"
+    ]
 
-    for target_csv in [output_csv_assets, output_csv_tmp]:
+    for target_csv in csv_destinations:
         try:
             os.makedirs(os.path.dirname(target_csv), exist_ok=True)
             with open(target_csv, "w", newline="", encoding="utf-8-sig") as f:
@@ -1676,19 +1827,10 @@ def export_listings(req: ExportRequest):
                 writer.writerow(headers)
                 for r in data_rows:
                     writer.writerow(r)
-            try:
-                shutil.copy2(target_csv, output_csv_root)
-            except OSError:
-                pass
-            break
         except OSError:
-            continue
+            pass
 
-    # 2. Write clean XLSX using openpyxl (Fast, thread-safe, NO COM)
-    output_xlsx_assets = os.path.join(ASSETS_DIR, "eBay_Bulk_Upload_Completed.xlsx")
-    output_xlsx_root = os.path.join(APP_DIR, "eBay_Bulk_Upload_Completed.xlsx")
-    output_xlsx_tmp = "/tmp/eBay_Bulk_Upload_Completed.xlsx"
-
+    # 2. Write clean XLSX using openpyxl
     wb_out = openpyxl.Workbook()
     ws_out = wb_out.active
     ws_out.title = "Listings"
@@ -1706,7 +1848,6 @@ def export_listings(req: ExportRequest):
     # Write data rows
     for r_idx, row_vals in enumerate(data_rows, 5):
         for c_idx, val in enumerate(row_vals, 1):
-            # Format numbers cleanly
             if val is not None and str(val).replace('.', '', 1).isdigit():
                 try:
                     num_val = float(val) if '.' in str(val) else int(val)
@@ -1716,27 +1857,33 @@ def export_listings(req: ExportRequest):
                     pass
             ws_out.cell(r_idx, c_idx).value = val
 
-    for target_xlsx in [output_xlsx_assets, output_xlsx_tmp]:
+    xlsx_destinations = [
+        os.path.join(batch_dir, "eBay_Bulk_Upload_Completed.xlsx"),
+        os.path.join(ASSETS_DIR, "eBay_Bulk_Upload_Completed.xlsx"),
+        os.path.join(APP_DIR, "eBay_Bulk_Upload_Completed.xlsx"),
+        "/tmp/eBay_Bulk_Upload_Completed.xlsx"
+    ]
+
+    for target_xlsx in xlsx_destinations:
         try:
             os.makedirs(os.path.dirname(target_xlsx), exist_ok=True)
             wb_out.save(target_xlsx)
-            try:
-                shutil.copy2(target_xlsx, output_xlsx_root)
-            except OSError:
-                pass
-            break
         except OSError:
-            continue
+            pass
 
     total_value = sum(float(c.get("list_price", 0)) for c in cards_to_export)
 
     return {
         "status": "success",
+        "batch_name": batch_name,
+        "batch_folder": f"assets/{batch_name}",
         "exported_count": len(cards_to_export),
         "total_value": round(total_value, 2),
-        "csv_download_url": "/api/download/eBay_Bulk_Upload_Completed.csv",
-        "xlsx_download_url": "/api/download/eBay_Bulk_Upload_Completed.xlsx",
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+        "csv_download_url": f"/api/download/{batch_name}/eBay_Bulk_Upload_Completed.csv",
+        "xlsx_download_url": f"/api/download/{batch_name}/eBay_Bulk_Upload_Completed.xlsx",
+        "latest_csv_download_url": "/api/download/eBay_Bulk_Upload_Completed.csv",
+        "latest_xlsx_download_url": "/api/download/eBay_Bulk_Upload_Completed.xlsx",
+        "timestamp": timestamp_now
     }
 
 
@@ -1859,13 +2006,15 @@ def trigger_sync_sales():
     return result
 
 
-@app.get("/api/download/{filename}")
-@app.get("/download/{filename}")
-def download_file(filename: str):
+@app.get("/api/download/{filepath:path}")
+@app.get("/download/{filepath:path}")
+def download_file(filepath: str):
+    clean_path = filepath.replace("\\", "/").lstrip("/")
+    base_name = os.path.basename(clean_path)
     for candidate_dir in [ASSETS_DIR, APP_DIR, "/tmp"]:
-        file_path = os.path.join(candidate_dir, filename)
+        file_path = os.path.join(candidate_dir, clean_path)
         if os.path.exists(file_path):
-            return FileResponse(file_path, filename=filename, media_type="application/octet-stream")
+            return FileResponse(file_path, filename=base_name, media_type="application/octet-stream")
     raise HTTPException(status_code=404, detail="Requested file does not exist.")
 
 
