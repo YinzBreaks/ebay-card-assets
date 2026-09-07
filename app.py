@@ -987,19 +987,52 @@ def export_listings(req: ExportRequest):
     cdn = settings.get("cdn_prefix", CDN_BASE_URL)
 
     # Read base template row 4 headers
-    if not os.path.exists(TEMPLATE_FILE):
-        raise HTTPException(status_code=500, detail="Base eBay template file not found.")
-
     openpyxl.styles.fonts.Font.family.max = 100
-    wb_template = openpyxl.load_workbook(TEMPLATE_FILE, data_only=True)
-    ws_template = wb_template["Listings"]
+    ws_template = None
+    headers = []
+    template_candidates = [
+        TEMPLATE_FILE,
+        os.path.join(APP_DIR, "eBay-category-listing-template.xlsx"),
+        "/var/task/eBay-category-listing-template.xlsx"
+    ]
+    for candidate in template_candidates:
+        if os.path.exists(candidate):
+            try:
+                wb_template = openpyxl.load_workbook(candidate, data_only=True)
+                ws_template = wb_template["Listings"] if "Listings" in wb_template.sheetnames else wb_template.active
+                header_row_idx = 4
+                max_c = ws_template.max_column
+                headers = [ws_template.cell(header_row_idx, c).value for c in range(1, max_c + 1)]
+                while headers and headers[-1] is None:
+                    headers.pop()
+                if headers:
+                    break
+            except Exception as e:
+                print(f"Error reading candidate template {candidate}: {e}")
 
-    # Extract headers from row 4
-    header_row_idx = 4
-    max_c = ws_template.max_column
-    headers = [ws_template.cell(header_row_idx, c).value for c in range(1, max_c + 1)]
-    while headers and headers[-1] is None:
-        headers.pop()
+    # Fallback to ebay_upload.csv headers if template workbook not found
+    if not headers:
+        for candidate_csv in [os.path.join(APP_DIR, "ebay_upload.csv"), "/var/task/ebay_upload.csv"]:
+            if os.path.exists(candidate_csv):
+                try:
+                    with open(candidate_csv, "r", encoding="utf-8-sig") as f:
+                        reader = csv.reader(f)
+                        headers = next(reader, [])
+                        if headers:
+                            break
+                except Exception:
+                    pass
+
+    # Final hardcoded standard fallback
+    if not headers:
+        headers = [
+            "Action", "Custom label (SKU)", "Category ID", "Title", "Buy It Now price", "Quantity",
+            "Item photo URL", "Format", "Duration", "Condition ID", "Best Offer Enabled",
+            "Best Offer Auto Accept Price", "Minimum Best Offer Price", "Description", "Card Name",
+            "Sport", "Player/Athlete", "Parallel/Variety", "Season", "Manufacturer", "Features",
+            "Set", "Graded", "Grade", "Professional Grader", "Certification Number", "Card Number",
+            "Team", "Autographed", "Print Run"
+        ]
 
     # Map column headers to index
     header_map = {}

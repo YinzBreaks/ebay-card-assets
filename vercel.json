@@ -3,7 +3,16 @@
   "builds": [
     {
       "src": "app.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": [
+          "eBay-category-listing-template.xlsx",
+          "ebay_upload.csv",
+          "sales_ledger.json",
+          "data/**",
+          "web/**"
+        ]
+      }
     }
   ],
   "routes": [
