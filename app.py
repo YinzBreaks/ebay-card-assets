@@ -20,6 +20,9 @@ except Exception as e:
     pyzbar = None
 
 import openpyxl
+import imaplib
+import email
+from email.header import decode_header
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -37,10 +40,12 @@ DATA_DIR = os.path.join(APP_DIR, "data")
 WEB_DIR = os.path.join(APP_DIR, "web")
 CARDS_FILE = os.path.join(DATA_DIR, "cards.json")
 SETTINGS_FILE = os.path.join(DATA_DIR, "settings.json")
+SALES_LEDGER_FILE = os.path.join(APP_DIR, "sales_ledger.json")
 TEMPLATE_FILE = os.path.join(APP_DIR, "eBay-category-listing-template.xlsx")
 
 TMP_CARDS_FILE = "/tmp/cards.json"
 TMP_SETTINGS_FILE = "/tmp/settings.json"
+TMP_SALES_LEDGER_FILE = "/tmp/sales_ledger.json"
 
 for d in [ASSETS_DIR, DATA_DIR, WEB_DIR]:
     try:
@@ -156,6 +161,323 @@ def save_cards(cards: List[Dict[str, Any]]):
             break
         except OSError:
             continue
+
+
+# --- Persistent Sales Ledger & House Alpha Engine ---
+_in_memory_sales_ledger = None
+
+def load_sales_ledger() -> List[Dict[str, Any]]:
+    global _in_memory_sales_ledger
+    if _in_memory_sales_ledger is not None:
+        return _in_memory_sales_ledger
+
+    for path in [SALES_LEDGER_FILE, TMP_SALES_LEDGER_FILE, os.path.join(DATA_DIR, "sales_ledger.json")]:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        _in_memory_sales_ledger = data
+                        return _in_memory_sales_ledger
+            except Exception:
+                pass
+
+    _in_memory_sales_ledger = []
+    return _in_memory_sales_ledger
+
+
+def save_sales_ledger(ledger: List[Dict[str, Any]]):
+    global _in_memory_sales_ledger
+    _in_memory_sales_ledger = ledger
+    for path in [SALES_LEDGER_FILE, TMP_SALES_LEDGER_FILE]:
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(ledger, f, indent=2)
+            break
+        except OSError:
+            continue
+
+
+def calculate_house_alpha_metrics(ledger: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+    if ledger is None:
+        ledger = load_sales_ledger()
+
+    total_gross = sum(float(item.get("realized_price", 0.0)) for item in ledger)
+    total_base_comp = sum(float(item.get("base_comp_est", 0.0)) for item in ledger)
+    total_net = sum(float(item.get("net_payout", 0.0)) for item in ledger)
+    total_shipping = sum(float(item.get("shipping_charged", 0.0)) for item in ledger)
+    total_fees = sum(float(item.get("ebay_fee_est", 0.0)) for item in ledger)
+
+    if total_base_comp > 0:
+        overall_beat_rate = round(((total_gross - total_base_comp) / total_base_comp) * 100, 1)
+    else:
+        overall_beat_rate = 0.0
+
+    return {
+        "total_gross": round(total_gross, 2),
+        "total_net": round(total_net, 2),
+        "total_shipping": round(total_shipping, 2),
+        "total_fees": round(total_fees, 2),
+        "house_alpha_pct": overall_beat_rate,
+        "sales_count": len(ledger)
+    }
+
+
+def calculate_calibrated_pricing(
+    base_comp: float,
+    title: str = "",
+    player: str = "",
+    card_set: str = "",
+    parallel: str = "",
+    grader: str = "PSA",
+    grade: str = "10",
+    card_number: str = "",
+    cert_number: str = ""
+) -> Dict[str, Any]:
+    text_corpus = f"{title} {card_set} {parallel} {player}".lower()
+
+    # 1. Detect print run & serial numbering
+    print_run = None
+    is_bookend = False
+
+    # Match patterns like 25/25, 1/15, 01/10, etc.
+    serial_match = re.search(r'\b(\d+)\s*/\s*(\d+)\b', text_corpus)
+    if serial_match:
+        num = int(serial_match.group(1))
+        denom = int(serial_match.group(2))
+        print_run = denom
+        if num == 1 or num == denom:
+            is_bookend = True
+    else:
+        slash_match = re.search(r'/\s*(\d+)\b', text_corpus)
+        if slash_match:
+            print_run = int(slash_match.group(1))
+
+    # Roman numerals check: I, II, III, IV, V, VI, VII, VIII, IX, X
+    has_roman = bool(re.search(r'\b(i|ii|iii|iv|v|vi|vii|viii|ix|x)\b', text_corpus))
+
+    # Low print run <= 15
+    is_low_print = (print_run is not None and print_run <= 15) or has_roman
+
+    # Non-sport gem (Disney, Kakawow, Marvel, Star Wars, Entertainment) with PSA 10 / Gem Mint
+    is_non_sport = any(kw in text_corpus for kw in ["disney", "kakawow", "marvel", "star wars", "entertainment", "lorcana"])
+    is_gem = str(grade).strip().upper() in ["10", "GEM MINT", "GEM-MT"]
+    is_non_sport_gem = is_non_sport and is_gem
+
+    tags = []
+    if is_low_print:
+        tags.append("low_print_le_15")
+    if is_bookend:
+        tags.append("bookend")
+    if is_non_sport_gem:
+        tags.append("non_sport_gem")
+    elif is_non_sport:
+        tags.append("non_sport")
+
+    # Base markup baseline is +15%
+    markup_pct = 0.15
+    justification_notes = []
+
+    # Rule A: If print_run <= 15 or Roman Numeral: +30% to base comp markup
+    if is_low_print:
+        markup_pct += 0.30
+        justification_notes.append("Ultra-rare print (<= /15 or Roman): +30% House Alpha markup applied")
+
+    # Rule B: If is_bookend (1/N or N/N): extra +15% scarcity premium
+    if is_bookend:
+        markup_pct += 0.15
+        justification_notes.append("Bookend serial scarcity (1/N or N/N): +15% alpha premium applied")
+
+    # Calculate target list price
+    list_price = round(base_comp * (1.0 + markup_pct), 2)
+
+    # Rule C: If non_sport_gem: anchor list price at base comp + 25% with zero auto-accept discount
+    if is_non_sport_gem:
+        if markup_pct < 0.25:
+            list_price = round(base_comp * 1.25, 2)
+            markup_pct = 0.25
+        auto_accept = list_price
+        min_offer = round(list_price * 0.90, 2)
+        justification_notes.append("Non-Sport Gem Mint tier: 0% discount lock applied (Auto-Accept = List Price)")
+    else:
+        auto_accept = round(list_price * 0.85, 2)
+        min_offer = round(list_price * 0.75, 2)
+
+    has_alpha_boost = len(tags) > 0 or markup_pct > 0.15 or is_non_sport_gem
+
+    return {
+        "list_price": list_price,
+        "auto_accept": auto_accept,
+        "min_offer": min_offer,
+        "markup_pct": round(markup_pct * 100, 1),
+        "print_run": print_run,
+        "is_bookend": is_bookend,
+        "tags": tags,
+        "alpha_boost": has_alpha_boost,
+        "justification_notes": justification_notes
+    }
+
+
+def sync_sales_from_email() -> Dict[str, Any]:
+    email_user = os.getenv("EBAY_ALERT_EMAIL")
+    email_pass = os.getenv("GMAIL_APP_PASSWORD")
+
+    if not email_user or not email_pass:
+        return {
+            "status": "config_required",
+            "message": "EBAY_ALERT_EMAIL and GMAIL_APP_PASSWORD environment variables are not configured. Configure credentials or use Manual Sale Entry.",
+            "processed_count": 0,
+            "new_sales": []
+        }
+
+    try:
+        mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+        mail.login(email_user, email_pass)
+        mail.select("INBOX")
+
+        status, messages = mail.search(None, '(UNSEEN FROM "ebay@ebay.com" SUBJECT "You made the sale")')
+        if status != "OK" or not messages[0]:
+            mail.logout()
+            return {
+                "status": "success",
+                "message": "Connected to eBay alert inbox. No new unread sale emails found.",
+                "processed_count": 0,
+                "new_sales": []
+            }
+
+        msg_ids = messages[0].split()
+        new_sales = []
+        ledger = load_sales_ledger()
+        existing_orders = {s.get("order_id") for s in ledger}
+        inventory = get_cards()
+
+        for mid in msg_ids:
+            res, data = mail.fetch(mid, "(RFC822)")
+            if res != "OK":
+                continue
+
+            raw_email = data[0][1]
+            msg = email.message_from_bytes(raw_email)
+
+            body = ""
+            if msg.is_multipart():
+                for part in msg.walk():
+                    content_type = part.get_content_type()
+                    content_disposition = str(part.get("Content-Disposition"))
+                    if content_type == "text/plain" and "attachment" not in content_disposition:
+                        payload = part.get_payload(decode=True)
+                        if payload:
+                            body += payload.decode("utf-8", errors="ignore")
+            else:
+                payload = msg.get_payload(decode=True)
+                if payload:
+                    body = payload.decode("utf-8", errors="ignore")
+
+            # Extract fields via regex
+            order_m = re.search(r'Order:\s*([\d-]+)', body, re.IGNORECASE)
+            order_id = order_m.group(1).strip() if order_m else f"01-{int(time.time())}"
+
+            if order_id in existing_orders:
+                continue
+
+            price_m = re.search(r'Sold:\s*\$?([\d,]+\.\d{2})', body, re.IGNORECASE)
+            realized_price = float(price_m.group(1).replace(",", "")) if price_m else 0.0
+
+            ship_m = re.search(r'Shipping:\s*\$?([\d,]+\.\d{2})', body, re.IGNORECASE)
+            shipping_charged = float(ship_m.group(1).replace(",", "")) if ship_m else 5.0
+
+            date_m = re.search(r'Date sold:\s*([^\n\r]+)', body, re.IGNORECASE)
+            sold_date = date_m.group(1).strip() if date_m else time.strftime("%Y-%m-%d")
+
+            buyer_m = re.search(r'Buyer:\s*([^\n\r]+)', body, re.IGNORECASE)
+            buyer_handle = buyer_m.group(1).strip() if buyer_m else "ebay_buyer"
+
+            ship_by_m = re.search(r'Ship by:\s*([^\n\r]+)', body, re.IGNORECASE)
+            ship_by_date = ship_by_m.group(1).strip() if ship_by_m else "Within 2 business days"
+
+            title_m = re.search(r'Title:\s*([^\n\r]+)', body, re.IGNORECASE)
+            if not title_m:
+                title_m = re.search(r'(20\d{2}[^\n\r]+(?:PSA|BGS|CGC|SGC)[^\n\r]+)', body)
+            email_title = title_m.group(1).strip() if title_m else "Trading Card Single"
+
+            # Match with inventory card by title snippet or SKU
+            matched_card = None
+            for c in inventory:
+                if c.get("status") != "SOLD":
+                    c_title = c.get("title", "").lower()
+                    c_sku = c.get("sku", "").lower()
+                    if c_sku in body.lower() or (len(email_title) > 10 and email_title.lower()[:20] in c_title):
+                        matched_card = c
+                        break
+
+            if matched_card:
+                matched_card["status"] = "SOLD"
+                sku = matched_card.get("sku")
+                title = matched_card.get("title")
+                player = matched_card.get("player", "")
+                card_set = matched_card.get("set", "")
+                base_comp_est = float(matched_card.get("base_comp", matched_card.get("list_price", 100.0) / 1.15))
+                suggested_bin = float(matched_card.get("list_price", realized_price))
+                front_url = matched_card.get("front_url", "")
+            else:
+                sku = f"SALE-{order_id[-6:]}"
+                title = email_title
+                player = title.split()[2] if len(title.split()) > 2 else "Athlete"
+                card_set = "Sports Card"
+                base_comp_est = round(realized_price / 1.15, 2)
+                suggested_bin = realized_price
+                front_url = ""
+
+            fee_est = round((realized_price * 0.1325) + 0.30, 2)
+            net_payout = round(realized_price - fee_est, 2)
+            alpha_comp = round(((realized_price - base_comp_est) / base_comp_est) * 100, 2) if base_comp_est > 0 else 0.0
+            alpha_bin = round(((realized_price - suggested_bin) / suggested_bin) * 100, 2) if suggested_bin > 0 else 0.0
+
+            sale_record = {
+                "order_id": order_id,
+                "sku": sku,
+                "title": title,
+                "player": player,
+                "set": card_set,
+                "print_run": None,
+                "is_bookend": False,
+                "base_comp_est": base_comp_est,
+                "suggested_bin": suggested_bin,
+                "realized_price": realized_price,
+                "shipping_charged": shipping_charged,
+                "ebay_fee_est": fee_est,
+                "net_payout": net_payout,
+                "alpha_vs_comp_pct": alpha_comp,
+                "alpha_vs_bin_pct": alpha_bin,
+                "tags": ["email_sync"],
+                "sold_date": sold_date,
+                "buyer_handle": buyer_handle,
+                "ship_by_date": ship_by_date,
+                "front_url": front_url
+            }
+
+            ledger.insert(0, sale_record)
+            existing_orders.add(order_id)
+            new_sales.append(sale_record)
+
+        save_sales_ledger(ledger)
+        save_cards(inventory)
+        mail.logout()
+
+        return {
+            "status": "success",
+            "message": f"Successfully processed {len(new_sales)} new sale(s) from eBay alert emails.",
+            "processed_count": len(new_sales),
+            "new_sales": new_sales
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"IMAP sync failed: {str(e)}",
+            "processed_count": 0,
+            "new_sales": []
+        }
 
 
 def seed_cards_from_csv() -> List[Dict[str, Any]]:
@@ -443,11 +765,25 @@ async def upload_card(
     else:
         final_back = final_front
 
-    # Valuation & Pricing calculation
+    generated_title = card_title or f"2024-25 {card_set or 'Panini Select'} {safe_player} {parallel or 'Prizm'} {safe_grader} {safe_grade} GEM MINT #{safe_card_num}"
+
+    # Valuation & Dynamic House Alpha Pricing calculation
     base = base_price if base_price and base_price > 0 else float(np.random.choice([89.0, 119.0, 149.0, 199.0, 249.0, 320.0]))
-    list_price = round(base * 1.15, 2)
-    auto_accept = round(list_price * 0.85, 2)
-    min_offer = round(list_price * 0.75, 2)
+    calibrated = calculate_calibrated_pricing(
+        base_comp=base,
+        title=generated_title,
+        player=safe_player,
+        card_set=card_set or "Panini Select",
+        parallel=parallel or "Prizm",
+        grader=safe_grader,
+        grade=safe_grade,
+        card_number=safe_card_num,
+        cert_number=detected_cert
+    )
+
+    list_price = calibrated["list_price"]
+    auto_accept = calibrated["auto_accept"]
+    min_offer = calibrated["min_offer"]
 
     settings = load_settings()
     cdn = settings.get("cdn_prefix", CDN_BASE_URL)
@@ -456,11 +792,11 @@ async def upload_card(
 
     justification = (
         f"Verified {safe_grader} {safe_grade} (Cert #{detected_cert}). Market comp baseline: ${base:.2f}. "
-        f"+15% premium applied for FixedPrice Buy-It-Now (${list_price:.2f}). "
-        f"Auto-Accept protected at 85% (${auto_accept:.2f}) with minimum floor at 75% (${min_offer:.2f})."
+        f"+{calibrated['markup_pct']}% markup applied for FixedPrice Buy-It-Now (${list_price:.2f}). "
+        f"Auto-Accept protected at ${auto_accept:.2f} with minimum floor at ${min_offer:.2f}."
     )
-
-    generated_title = card_title or f"2024-25 {card_set or 'Panini Select'} {safe_player} {parallel or 'Prizm'} {safe_grader} {safe_grade} GEM MINT #{safe_card_num}"
+    if calibrated["justification_notes"]:
+        justification += " [House Alpha: " + " • ".join(calibrated["justification_notes"]) + "]"
 
     new_card = {
         "sku": sku,
@@ -485,6 +821,10 @@ async def upload_card(
         "front_cdn": front_cdn_url,
         "back_cdn": back_cdn_url,
         "status": "COMPED",
+        "alpha_boost": calibrated["alpha_boost"],
+        "alpha_tags": calibrated["tags"],
+        "print_run": calibrated["print_run"],
+        "is_bookend": calibrated["is_bookend"],
         "comps": [
             {"date": "2 days ago", "platform": "eBay Sold", "price": round(base * 0.98, 2), "grade": f"{safe_grader} {safe_grade}"},
             {"date": "5 days ago", "platform": "130Point / PWCC", "price": round(base * 1.05, 2), "grade": f"{safe_grader} {safe_grade}"},
@@ -799,6 +1139,125 @@ def export_listings(req: ExportRequest):
         "xlsx_download_url": "/api/download/eBay_Bulk_Upload_Completed.xlsx",
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
     }
+
+
+# --- Sales Ledger & Sync Endpoints ---
+class ManualSaleRequest(BaseModel):
+    sku: Optional[str] = None
+    order_id: Optional[str] = None
+    realized_price: float
+    shipping_charged: Optional[float] = 5.0
+    sold_date: Optional[str] = None
+    buyer_handle: Optional[str] = "ebay_buyer"
+    ship_by_date: Optional[str] = "Within 2 business days"
+    title: Optional[str] = None
+    base_comp_est: Optional[float] = None
+    suggested_bin: Optional[float] = None
+    tags: Optional[List[str]] = None
+
+
+@app.get("/api/sales")
+@app.get("/sales")
+def get_sales():
+    ledger = load_sales_ledger()
+    kpis = calculate_house_alpha_metrics(ledger)
+    return {
+        "status": "success",
+        "kpis": kpis,
+        "ledger": ledger
+    }
+
+
+@app.post("/api/sales/manual-entry")
+@app.post("/sales/manual-entry")
+def manual_sale_entry(req: ManualSaleRequest):
+    ledger = load_sales_ledger()
+    inventory = get_cards()
+
+    matched_card = None
+    if req.sku:
+        for c in inventory:
+            if c.get("sku") == req.sku:
+                matched_card = c
+                break
+
+    order_id = req.order_id or f"01-{int(time.time())}"
+    realized_price = round(float(req.realized_price), 2)
+    shipping_charged = round(float(req.shipping_charged or 5.0), 2)
+    sold_date = req.sold_date or time.strftime("%Y-%m-%d")
+    buyer_handle = req.buyer_handle or "ebay_buyer"
+    ship_by_date = req.ship_by_date or "Within 2 business days"
+
+    if matched_card:
+        matched_card["status"] = "SOLD"
+        sku = matched_card.get("sku")
+        title = matched_card.get("title")
+        player = matched_card.get("player", "")
+        card_set = matched_card.get("set", "")
+        base_comp_est = float(matched_card.get("base_comp", matched_card.get("list_price", 100.0) / 1.15))
+        suggested_bin = float(matched_card.get("list_price", realized_price))
+        front_url = matched_card.get("front_url", "")
+        tags = matched_card.get("alpha_tags", [])
+        if not tags:
+            tags = ["manual_sale"]
+    else:
+        sku = req.sku or f"MANUAL-{order_id[-6:]}"
+        title = req.title or f"Graded Trading Card ({sku})"
+        player = title.split()[2] if len(title.split()) > 2 else "Athlete"
+        card_set = "Sports Card"
+        base_comp_est = float(req.base_comp_est or round(realized_price / 1.15, 2))
+        suggested_bin = float(req.suggested_bin or realized_price)
+        front_url = ""
+        tags = req.tags or ["manual_sale"]
+
+    fee_est = round((realized_price * 0.1325) + 0.30, 2)
+    net_payout = round(realized_price - fee_est, 2)
+    alpha_comp = round(((realized_price - base_comp_est) / base_comp_est) * 100, 2) if base_comp_est > 0 else 0.0
+    alpha_bin = round(((realized_price - suggested_bin) / suggested_bin) * 100, 2) if suggested_bin > 0 else 0.0
+
+    sale_record = {
+        "order_id": order_id,
+        "sku": sku,
+        "title": title,
+        "player": player,
+        "set": card_set,
+        "print_run": None,
+        "is_bookend": False,
+        "base_comp_est": round(base_comp_est, 2),
+        "suggested_bin": round(suggested_bin, 2),
+        "realized_price": realized_price,
+        "shipping_charged": shipping_charged,
+        "ebay_fee_est": fee_est,
+        "net_payout": net_payout,
+        "alpha_vs_comp_pct": alpha_comp,
+        "alpha_vs_bin_pct": alpha_bin,
+        "tags": tags,
+        "sold_date": sold_date,
+        "buyer_handle": buyer_handle,
+        "ship_by_date": ship_by_date,
+        "front_url": front_url
+    }
+
+    ledger.insert(0, sale_record)
+    save_sales_ledger(ledger)
+    if matched_card:
+        save_cards(inventory)
+
+    return {
+        "status": "success",
+        "message": f"Sale recorded for {sku}: ${realized_price:.2f} (Net: ${net_payout:.2f})",
+        "sale": sale_record,
+        "kpis": calculate_house_alpha_metrics(ledger)
+    }
+
+
+@app.post("/api/sync-sales")
+@app.post("/sync-sales")
+def trigger_sync_sales():
+    result = sync_sales_from_email()
+    ledger = load_sales_ledger()
+    result["kpis"] = calculate_house_alpha_metrics(ledger)
+    return result
 
 
 @app.get("/api/download/{filename}")

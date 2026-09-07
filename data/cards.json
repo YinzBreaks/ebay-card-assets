@@ -1,13 +1,13 @@
 [
   {
-    "sku": "FCB-SELECT-219-PSA10",
+    "sku": "FCB-SELECT-62-PSA10",
     "title": "2024-25 Panini Select Lamine Yamal Mojo RC",
     "player": "Select",
     "team": "FCB",
     "sport": "Soccer",
     "season": "2024-25",
     "set": "Panini Select",
-    "card_number": "219",
+    "card_number": "62",
     "parallel": "Prizm",
     "grader": "PSA",
     "grade": "10",
@@ -16,12 +16,12 @@
     "auto_accept": 342.12,
     "min_offer": 301.88,
     "base_comp": 350.0,
-    "justification": "Verified PSA 10 (Cert #101889066). Market comp baseline: $350.00. +15% premium applied for FixedPrice Buy-It-Now ($402.50). Auto-Accept protected at 85% ($342.12) with minimum floor at 75% ($301.88).",
-    "front_url": "/assets/9_6_28_upload/FCB-SELECT-219-PSA10-FRONT.jpg",
-    "back_url": "/assets/9_6_28_upload/FCB-SELECT-219-PSA10-BACK.jpg",
-    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-219-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-219-PSA10-BACK.jpg",
-    "status": "COMPED",
+    "justification": "Adjusted valuation: $402.50. Auto-Accept at $342.12, Min Floor at $301.88. [MANUAL PRICE OVERRIDE]",
+    "front_url": "/assets/9_6_28_upload/FCB-SELECT-62-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/FCB-SELECT-62-PSA10-BACK.jpg",
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-62-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-62-PSA10-BACK.jpg",
+    "status": "APPROVED",
     "comps": [
       {
         "date": "2 days ago",
@@ -41,7 +41,59 @@
         "price": 332.5,
         "grade": "PSA 10"
       }
-    ]
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
+  },
+  {
+    "sku": "FCB-SELECT-219-PSA10",
+    "title": "2024-25 Panini Select Lamine Yamal Mojo RC",
+    "player": "Select",
+    "team": "FCB",
+    "sport": "Soccer",
+    "season": "2024-25",
+    "set": "Panini Select",
+    "card_number": "219",
+    "parallel": "Prizm",
+    "grader": "PSA",
+    "grade": "10",
+    "cert_number": "101889066",
+    "list_price": 525.0,
+    "auto_accept": 446.25,
+    "min_offer": 393.75,
+    "base_comp": 350.0,
+    "justification": "Adjusted valuation: $525.00. Auto-Accept at $446.25, Min Floor at $393.75. [CHALLENGED: 'Rare /25 Pink parallel. High demand rookie.']",
+    "front_url": "/assets/9_6_28_upload/FCB-SELECT-219-PSA10-FRONT.jpg",
+    "back_url": "/assets/9_6_28_upload/FCB-SELECT-219-PSA10-BACK.jpg",
+    "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-219-PSA10-FRONT.jpg",
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-SELECT-219-PSA10-BACK.jpg",
+    "status": "APPROVED",
+    "comps": [
+      {
+        "date": "2 days ago",
+        "platform": "eBay Sold",
+        "price": 343.0,
+        "grade": "PSA 10"
+      },
+      {
+        "date": "5 days ago",
+        "platform": "130Point / PWCC",
+        "price": 367.5,
+        "grade": "PSA 10"
+      },
+      {
+        "date": "2 weeks ago",
+        "platform": "Goldin Auctions",
+        "price": 332.5,
+        "grade": "PSA 10"
+      }
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "FCB-SELECT-181-PSA10",
@@ -85,7 +137,11 @@
         "price": 332.5,
         "grade": "PSA 10"
       }
-    ]
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "FCB-SELECT-221-PSA10",
@@ -129,7 +185,11 @@
         "price": 332.5,
         "grade": "PSA 10"
       }
-    ]
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "FCB-SELECT-131-PSA10",
@@ -173,7 +233,11 @@
         "price": 332.5,
         "grade": "PSA 10"
       }
-    ]
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "FCB-SELECT-110-PSA10",
@@ -217,7 +281,11 @@
         "price": 332.5,
         "grade": "PSA 10"
       }
-    ]
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "FCB-SELECT-222-PSA10",
@@ -261,7 +329,11 @@
         "price": 332.5,
         "grade": "PSA 10"
       }
-    ]
+    ],
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "MUN-GARNACHO-199-PSA10",
@@ -305,7 +377,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-GARNACHO-199-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 25,
+    "is_bookend": false
   },
   {
     "sku": "RMA-VINI-112-PSA10",
@@ -349,7 +425,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-VINI-112-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-VINI-112-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-VINI-112-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "DIS-RAYA-174-PSA10",
@@ -371,7 +451,7 @@
     "justification": "Market baseline ~$217.38 based on 3 recent Professional Sports Authenticator (PSA) 10 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
     "front_url": "/assets/9_6_28_upload/DIS-RAYA-174-PSA10-FRONT.jpg",
     "back_url": "/assets/9_6_28_upload/DIS-RAYA-174-PSA10-BACK.jpg",
-    "status": "APPROVED",
+    "status": "SOLD",
     "comps": [
       {
         "date": "3 days ago",
@@ -393,7 +473,16 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/DIS-RAYA-174-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/DIS-RAYA-174-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/DIS-RAYA-174-PSA10-BACK.jpg",
+    "alpha_boost": true,
+    "alpha_tags": [
+      "non_sport_gem"
+    ],
+    "print_run": 50,
+    "is_bookend": false,
+    "alpha_justification": [
+      "Non-Sport Gem Mint tier: 0% discount lock applied (Auto-Accept = List Price)"
+    ]
   },
   {
     "sku": "UGA-BECK-1OF1-PSA9",
@@ -437,7 +526,18 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/UGA-BECK-1OF1-PSA9-BACK.jpg",
+    "alpha_boost": true,
+    "alpha_tags": [
+      "low_print_le_15",
+      "bookend"
+    ],
+    "print_run": 1,
+    "is_bookend": true,
+    "alpha_justification": [
+      "Ultra-rare print (<= /15 or Roman): +30% House Alpha markup applied",
+      "Bookend serial scarcity (1/N or N/N): +15% alpha premium applied"
+    ]
   },
   {
     "sku": "USA-PULISIC-201-PSA10",
@@ -481,7 +581,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/USA-PULISIC-201-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/USA-PULISIC-201-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/USA-PULISIC-201-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "ENG-PALMER-166-PSA9",
@@ -525,7 +629,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/ENG-PALMER-166-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/ENG-PALMER-166-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/ENG-PALMER-166-PSA9-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 75,
+    "is_bookend": false
   },
   {
     "sku": "SPONGE-KAREN-SAK-PSA9",
@@ -569,7 +677,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SPONGE-KAREN-SAK-PSA9-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "MCI-HAALAND-227-PSA9",
@@ -613,7 +725,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-HAALAND-227-PSA9-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 125,
+    "is_bookend": false
   },
   {
     "sku": "MUN-BADGE-199-PSA9",
@@ -635,7 +751,7 @@
     "justification": "Market baseline ~$92.17 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
     "front_url": "/assets/9_6_28_upload/MUN-BADGE-199-PSA9-FRONT.jpg",
     "back_url": "/assets/9_6_28_upload/MUN-BADGE-199-PSA9-BACK.jpg",
-    "status": "APPROVED",
+    "status": "SOLD",
     "comps": [
       {
         "date": "3 days ago",
@@ -657,7 +773,16 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-BADGE-199-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-BADGE-199-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MUN-BADGE-199-PSA9-BACK.jpg",
+    "alpha_boost": true,
+    "alpha_tags": [
+      "bookend"
+    ],
+    "print_run": 25,
+    "is_bookend": true,
+    "alpha_justification": [
+      "Bookend serial scarcity (1/N or N/N): +15% alpha premium applied"
+    ]
   },
   {
     "sku": "LIV-ALISSON-PAB-PSA10",
@@ -701,7 +826,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-ALISSON-PAB-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "LIV-GERRARD-SSG-PSA10",
@@ -745,7 +874,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-GERRARD-SSG-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": null,
+    "is_bookend": false
   },
   {
     "sku": "PAL-ENDRICK-158-PSA10",
@@ -789,7 +922,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/PAL-ENDRICK-158-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 195,
+    "is_bookend": false
   },
   {
     "sku": "LIV-CHIESA-136-PSA10",
@@ -833,7 +970,16 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/LIV-CHIESA-136-PSA10-BACK.jpg",
+    "alpha_boost": true,
+    "alpha_tags": [
+      "low_print_le_15"
+    ],
+    "print_run": 10,
+    "is_bookend": false,
+    "alpha_justification": [
+      "Ultra-rare print (<= /15 or Roman): +30% House Alpha markup applied"
+    ]
   },
   {
     "sku": "FCB-GAVI-PATCHAUTO-3",
@@ -877,7 +1023,18 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-GAVI-PATCHAUTO-3-BACK.jpg",
+    "alpha_boost": true,
+    "alpha_tags": [
+      "low_print_le_15",
+      "bookend"
+    ],
+    "print_run": 3,
+    "is_bookend": true,
+    "alpha_justification": [
+      "Ultra-rare print (<= /15 or Roman): +30% House Alpha markup applied",
+      "Bookend serial scarcity (1/N or N/N): +15% alpha premium applied"
+    ]
   },
   {
     "sku": "CHE-ENZO-AEF-PSA10",
@@ -921,7 +1078,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/CHE-ENZO-AEF-PSA10-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 50,
+    "is_bookend": false
   },
   {
     "sku": "MCI-SHAW-BS-PSA9",
@@ -965,7 +1126,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/MCI-SHAW-BS-PSA9-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 25,
+    "is_bookend": false
   },
   {
     "sku": "SCP-QUENDA-BAGQ-PSA9",
@@ -1009,7 +1174,11 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/SCP-QUENDA-BAGQ-PSA9-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 125,
+    "is_bookend": false
   },
   {
     "sku": "RMA-ATHENEA-AD-PSA9",
@@ -1031,7 +1200,7 @@
     "justification": "Market baseline ~$108.79 based on 3 recent Professional Sports Authenticator (PSA) 9 sales. +15% listing target applied for BIN with 85% Auto-Accept and 75% Min Floor.",
     "front_url": "/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-FRONT.jpg",
     "back_url": "/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-BACK.jpg",
-    "status": "APPROVED",
+    "status": "SOLD",
     "comps": [
       {
         "date": "3 days ago",
@@ -1053,7 +1222,16 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-BACK.jpg",
+    "alpha_boost": true,
+    "alpha_tags": [
+      "low_print_le_15"
+    ],
+    "print_run": 11,
+    "is_bookend": false,
+    "alpha_justification": [
+      "Ultra-rare print (<= /15 or Roman): +30% House Alpha markup applied"
+    ]
   },
   {
     "sku": "FCB-LEON-FR8-PSA9",
@@ -1097,6 +1275,10 @@
       }
     ],
     "front_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-FRONT.jpg",
-    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-BACK.jpg"
+    "back_cdn": "https://cdn.jsdelivr.net/gh/YinzBreaks/ebay-card-assets@main/assets/9_6_28_upload/FCB-LEON-FR8-PSA9-BACK.jpg",
+    "alpha_boost": false,
+    "alpha_tags": [],
+    "print_run": 25,
+    "is_bookend": false
   }
 ]

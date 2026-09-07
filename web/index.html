@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <!-- Batch Aggregate KPI Metrics -->
+      <!-- Batch Aggregate KPI Metrics & Sales Realized Metrics -->
       <div class="batch-kpis">
         <div class="kpi-card">
           <span class="kpi-title">Batch Inventory</span>
@@ -45,15 +45,36 @@
           <span class="kpi-title">Ready / Approved</span>
           <span class="kpi-val text-emerald" id="kpiApprovedCount">0</span>
         </div>
+        <!-- House Alpha & Realized Sales Pills -->
+        <div class="kpi-card kpi-sales">
+          <span class="kpi-title">Total Sold Gross</span>
+          <span class="kpi-val text-violet" id="kpiTotalSoldGross">$455.98</span>
+        </div>
+        <div class="kpi-card kpi-sales">
+          <span class="kpi-title">Net Realized</span>
+          <span class="kpi-val text-emerald" id="kpiNetRealized">$394.66</span>
+        </div>
+        <div class="kpi-card kpi-sales" title="Average beat rate of sold items vs base comps">
+          <span class="kpi-title">House Alpha</span>
+          <span class="kpi-val text-gold" id="kpiHouseAlpha">+40.3%</span>
+        </div>
       </div>
 
       <div class="header-right">
+        <button class="btn btn-secondary" id="syncSalesBtn" title="Sync sales confirmation emails via IMAP">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span id="syncSalesText">Sync Sales</span>
+        </button>
+        <button class="btn btn-secondary" id="viewSalesLedgerBtn" title="View persistent sales ledger and realized profit metrics">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          Sales Ledger
+        </button>
         <button class="btn btn-secondary" id="openSettingsBtn">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           Policies
         </button>
         <button class="btn btn-primary btn-glow" id="exportEbayBtn">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
           Export eBay Template
         </button>
       </div>
@@ -164,6 +185,7 @@
               <button class="pill" data-filter="APPROVED">Approved (<span id="countApproved">0</span>)</button>
               <button class="pill" data-filter="CHALLENGED">Challenged (<span id="countChallenged">0</span>)</button>
               <button class="pill" data-filter="COMPED">Pending Review (<span id="countComped">0</span>)</button>
+              <button class="pill" data-filter="SOLD">Sold (<span id="countSold">0</span>)</button>
             </div>
           </div>
           <div class="toolbar-right">
@@ -446,6 +468,121 @@
     </div>
   </div>
 
-  <script src="/app.js?v=3"></script>
+  <!-- SALES LEDGER MODAL -->
+  <div class="modal-backdrop" id="salesLedgerModal">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="badge-tag badge-tag-violet">REALIZED PERFORMANCE</span>
+          <h2>eBay Sales Ledger & Dynamic House Alpha</h2>
+          <p class="modal-subtitle">Tracking completed liquidations, eBay net proceeds, and historical comp beat rates</p>
+        </div>
+        <div class="modal-header-actions" style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn btn-sm btn-primary" id="openRecordSaleBtn">+ Record Sale</button>
+          <button class="btn btn-sm btn-secondary" id="ledgerSyncSalesBtn">Sync Email</button>
+          <button class="modal-close" id="closeSalesLedgerModalBtn">&times;</button>
+        </div>
+      </div>
+
+      <!-- Ledger Summary Stats -->
+      <div class="ledger-stats-strip">
+        <div class="ledger-stat-box">
+          <span class="l-stat-label">Total Realized Gross</span>
+          <span class="l-stat-val text-violet" id="ledgerTotalGross">$455.98</span>
+        </div>
+        <div class="ledger-stat-box">
+          <span class="l-stat-label">Net Realized Payout</span>
+          <span class="l-stat-val text-emerald" id="ledgerNetPayout">$394.66</span>
+        </div>
+        <div class="ledger-stat-box">
+          <span class="l-stat-label">House Alpha (vs Comps)</span>
+          <span class="l-stat-val text-gold" id="ledgerHouseAlpha">+40.3%</span>
+        </div>
+        <div class="ledger-stat-box">
+          <span class="l-stat-label">Completed Orders</span>
+          <span class="l-stat-val" id="ledgerOrderCount">3</span>
+        </div>
+      </div>
+
+      <!-- Sales Table -->
+      <div class="ledger-table-wrap">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th width="60">Slab</th>
+              <th>SKU / Card Details</th>
+              <th width="150">Order / Date</th>
+              <th width="140">Buyer</th>
+              <th width="110" style="text-align: right;">Sold Price</th>
+              <th width="120" style="text-align: right;">Net Payout</th>
+              <th width="110" style="text-align: center;">Beat Comp</th>
+              <th width="120">Ship By</th>
+            </tr>
+          </thead>
+          <tbody id="salesLedgerBody">
+            <!-- Rendered by app.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORD MANUAL SALE MODAL -->
+  <div class="modal-backdrop" id="recordSaleModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="badge-tag">MANUAL SALE ENTRY</span>
+          <h2>Record Completed Sale</h2>
+        </div>
+        <button class="modal-close" id="closeRecordSaleModalBtn">&times;</button>
+      </div>
+      <div class="modal-card-content">
+        <div class="form-group">
+          <label>Select Staged Card (or enter SKU below)</label>
+          <select id="saleCardSelect">
+            <option value="">-- Choose active staged card --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Custom Label (SKU)</label>
+          <input type="text" id="manualSaleSku" placeholder="e.g. FCB-SELECT-219-PSA10">
+        </div>
+        <div class="form-row" style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>Realized Sold Price ($)</label>
+            <input type="number" step="0.01" id="manualSalePrice" placeholder="e.g. 150.00" required>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Shipping Revenue ($)</label>
+            <input type="number" step="0.01" id="manualSaleShipping" value="5.00">
+          </div>
+        </div>
+        <div class="form-row" style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>Buyer Handle</label>
+            <input type="text" id="manualSaleBuyer" placeholder="e.g. card_collector_99">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>eBay Order ID (Optional)</label>
+            <input type="text" id="manualSaleOrderId" placeholder="e.g. 01-15220-99412">
+          </div>
+        </div>
+        <div class="form-row" style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>Sold Date</label>
+            <input type="date" id="manualSaleDate">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Ship By Deadline</label>
+            <input type="text" id="manualSaleShipBy" placeholder="e.g. Within 2 business days">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="submitManualSaleBtn" style="width: 100%;">Record Liquidation & Update Alpha</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=4"></script>
 </body>
 </html>

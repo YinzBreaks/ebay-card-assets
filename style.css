@@ -1424,3 +1424,155 @@ body {
 .form-group input:focus {
   border-color: var(--psa-gold);
 }
+
+/* Color Utilities */
+.text-violet {
+  color: #c084fc !important;
+}
+
+.text-gold {
+  color: var(--psa-gold) !important;
+}
+
+.badge-tag-violet {
+  background: rgba(192, 132, 252, 0.15) !important;
+  color: #d8b4fe !important;
+  border-color: rgba(192, 132, 252, 0.4) !important;
+}
+
+/* Header Sales KPIs */
+.kpi-card.kpi-sales {
+  background: linear-gradient(180deg, rgba(147, 51, 234, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+.kpi-card.kpi-sales:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+}
+
+/* Alpha Boost Tag / Badge */
+.badge-alpha-boost {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border: 1px solid rgba(216, 180, 254, 0.4);
+  color: #f3e8ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+  animation: alphaShimmer 3s infinite alternate;
+}
+
+@keyframes alphaShimmer {
+  0% { border-color: rgba(216, 180, 254, 0.4); box-shadow: 0 0 6px rgba(168, 85, 247, 0.2); }
+  100% { border-color: rgba(245, 158, 11, 0.6); box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); }
+}
+
+/* Wide Modal for Sales Ledger */
+.modal-card.modal-card-wide {
+  width: 95vw;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.ledger-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 16px 24px;
+  background: rgba(15, 23, 42, 0.6);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ledger-stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.l-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.l-stat-val {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ledger-table-wrap {
+  overflow-y: auto;
+  max-height: 60vh;
+  padding: 0 24px 24px;
+}
+
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.ledger-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 10px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 2;
+}
+
+.ledger-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.ledger-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.alpha-beat-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.alpha-beat-high {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.alpha-beat-mid {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}

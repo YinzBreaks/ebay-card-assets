@@ -20,9 +20,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const kpiTotalValue = document.getElementById("kpiTotalValue");
   const kpiTotalCount = document.getElementById("kpiTotalCount");
   const kpiApprovedCount = document.getElementById("kpiApprovedCount");
+  const kpiTotalSoldGross = document.getElementById("kpiTotalSoldGross");
+  const kpiNetRealized = document.getElementById("kpiNetRealized");
+  const kpiHouseAlpha = document.getElementById("kpiHouseAlpha");
   const countApproved = document.getElementById("countApproved");
   const countChallenged = document.getElementById("countChallenged");
   const countComped = document.getElementById("countComped");
+  const countSold = document.getElementById("countSold");
+  const syncSalesBtn = document.getElementById("syncSalesBtn");
+  const syncSalesText = document.getElementById("syncSalesText");
+  const viewSalesLedgerBtn = document.getElementById("viewSalesLedgerBtn");
+
+  // Sales Ledger Modal Elements
+  const salesLedgerModal = document.getElementById("salesLedgerModal");
+  const closeSalesLedgerModalBtn = document.getElementById("closeSalesLedgerModalBtn");
+  const openRecordSaleBtn = document.getElementById("openRecordSaleBtn");
+  const ledgerSyncSalesBtn = document.getElementById("ledgerSyncSalesBtn");
+  const ledgerTotalGross = document.getElementById("ledgerTotalGross");
+  const ledgerNetPayout = document.getElementById("ledgerNetPayout");
+  const ledgerHouseAlpha = document.getElementById("ledgerHouseAlpha");
+  const ledgerOrderCount = document.getElementById("ledgerOrderCount");
+  const salesLedgerBody = document.getElementById("salesLedgerBody");
+
+  // Record Sale Modal Elements
+  const recordSaleModal = document.getElementById("recordSaleModal");
+  const closeRecordSaleModalBtn = document.getElementById("closeRecordSaleModalBtn");
+  const saleCardSelect = document.getElementById("saleCardSelect");
+  const manualSaleSku = document.getElementById("manualSaleSku");
+  const manualSalePrice = document.getElementById("manualSalePrice");
+  const manualSaleShipping = document.getElementById("manualSaleShipping");
+  const manualSaleBuyer = document.getElementById("manualSaleBuyer");
+  const manualSaleOrderId = document.getElementById("manualSaleOrderId");
+  const manualSaleDate = document.getElementById("manualSaleDate");
+  const manualSaleShipBy = document.getElementById("manualSaleShipBy");
+  const submitManualSaleBtn = document.getElementById("submitManualSaleBtn");
 
   // Drop Zone Elements
   const dropZone = document.getElementById("dropZone");
@@ -98,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Initial Load ---
   fetchSettings();
   fetchCards();
+  fetchSales();
 
   // --- API Functions ---
   async function fetchSettings() {
@@ -130,6 +162,99 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // --- Sales Ledger & House Alpha State ---
+  let salesLedger = [];
+  let salesKPIs = {};
+
+  async function fetchSales() {
+    try {
+      const res = await fetch("/api/sales");
+      const data = await res.json();
+      if (data.status === "success") {
+        salesLedger = data.ledger || [];
+        salesKPIs = data.kpis || {};
+        updateSalesKPIs();
+        renderSalesLedger();
+      }
+    } catch (err) {
+      console.error("Failed to fetch sales ledger:", err);
+    }
+  }
+
+  function updateSalesKPIs() {
+    if (kpiTotalSoldGross && salesKPIs.total_gross !== undefined) {
+      kpiTotalSoldGross.textContent = `$${parseFloat(salesKPIs.total_gross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    if (kpiNetRealized && salesKPIs.total_net !== undefined) {
+      kpiNetRealized.textContent = `$${parseFloat(salesKPIs.total_net).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    if (kpiHouseAlpha && salesKPIs.house_alpha_pct !== undefined) {
+      const alphaVal = parseFloat(salesKPIs.house_alpha_pct);
+      kpiHouseAlpha.textContent = `${alphaVal >= 0 ? '+' : ''}${alphaVal.toFixed(1)}%`;
+    }
+
+    if (ledgerTotalGross && salesKPIs.total_gross !== undefined) {
+      ledgerTotalGross.textContent = `$${parseFloat(salesKPIs.total_gross).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    if (ledgerNetPayout && salesKPIs.total_net !== undefined) {
+      ledgerNetPayout.textContent = `$${parseFloat(salesKPIs.total_net).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    if (ledgerHouseAlpha && salesKPIs.house_alpha_pct !== undefined) {
+      const alphaVal = parseFloat(salesKPIs.house_alpha_pct);
+      ledgerHouseAlpha.textContent = `${alphaVal >= 0 ? '+' : ''}${alphaVal.toFixed(1)}%`;
+    }
+    if (ledgerOrderCount) {
+      ledgerOrderCount.textContent = salesLedger.length;
+    }
+  }
+
+  function renderSalesLedger() {
+    if (!salesLedgerBody) return;
+    salesLedgerBody.innerHTML = "";
+
+    salesLedger.forEach(sale => {
+      const tr = document.createElement("tr");
+      const alphaVal = parseFloat(sale.alpha_vs_comp_pct || 0);
+      const alphaClass = alphaVal >= 40 ? "alpha-beat-high" : "alpha-beat-mid";
+      const thumbUrl = sale.front_url || `/assets/9_6_28_upload/${sale.sku}-FRONT.jpg`;
+
+      tr.innerHTML = `
+        <td>
+          <div class="slab-thumb-wrap" style="width: 44px; height: 64px;">
+            <img src="${thumbUrl}" alt="${sale.sku}" onerror="this.src='/assets/9_6_28_upload/${sale.sku}.jpg'">
+          </div>
+        </td>
+        <td>
+          <span class="sku-code">${sale.sku}</span>
+          <div style="font-size: 11px; color: #e2e8f0; font-weight: 500; margin-top: 2px;">${sale.title || 'Graded Card Single'}</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 1px;">Base Comp: $${parseFloat(sale.base_comp_est || 0).toFixed(2)} • BIN: $${parseFloat(sale.suggested_bin || 0).toFixed(2)}</div>
+        </td>
+        <td>
+          <strong style="font-family: var(--font-mono); font-size: 12px; color: #fff;">${sale.order_id}</strong>
+          <div style="font-size: 11px; color: var(--text-muted);">${sale.sold_date}</div>
+        </td>
+        <td>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: #cbd5e1;">@${sale.buyer_handle || 'buyer'}</span>
+        </td>
+        <td style="text-align: right;">
+          <strong style="font-family: var(--font-mono); font-size: 14px; color: #fff;">$${parseFloat(sale.realized_price || 0).toFixed(2)}</strong>
+          <div style="font-size: 10px; color: var(--text-muted);">+$${parseFloat(sale.shipping_charged || 5).toFixed(2)} ship</div>
+        </td>
+        <td style="text-align: right;">
+          <strong style="font-family: var(--font-mono); font-size: 14px; color: var(--emerald);">$${parseFloat(sale.net_payout || 0).toFixed(2)}</strong>
+          <div style="font-size: 10px; color: var(--text-muted);">Fee: -$${parseFloat(sale.ebay_fee_est || 0).toFixed(2)}</div>
+        </td>
+        <td style="text-align: center;">
+          <span class="alpha-beat-pill ${alphaClass}">${alphaVal >= 0 ? '+' : ''}${alphaVal.toFixed(1)}%</span>
+        </td>
+        <td>
+          <span style="font-size: 12px; color: #94a3b8;">${sale.ship_by_date || 'Within 2 days'}</span>
+        </td>
+      `;
+      salesLedgerBody.appendChild(tr);
+    });
+  }
+
   // --- Rendering Functions ---
   function updateKPIs() {
     const totalCount = cards.length;
@@ -137,6 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const approvedCount = cards.filter(c => c.status === "APPROVED").length;
     const challengedCount = cards.filter(c => c.status === "CHALLENGED").length;
     const compedCount = cards.filter(c => c.status === "COMPED").length;
+    const soldCount = cards.filter(c => c.status === "SOLD").length;
 
     kpiTotalCount.textContent = totalCount;
     kpiTotalValue.textContent = `$${totalVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -145,6 +271,9 @@ document.addEventListener("DOMContentLoaded", () => {
     countApproved.textContent = approvedCount;
     countChallenged.textContent = challengedCount;
     countComped.textContent = compedCount;
+    if (countSold) {
+      countSold.textContent = soldCount;
+    }
   }
 
   function getFilteredCards() {
@@ -219,6 +348,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="justification-snippet" title="${card.justification || ''}">
               💡 ${card.justification || 'Market valuation verified.'}
             </div>
+            ${card.alpha_boost || (card.alpha_tags && card.alpha_tags.length > 0) ? `
+              <div style="margin-top: 6px;">
+                <span class="badge-alpha-boost">⚡ ALPHA BOOST ${card.alpha_tags ? ': ' + card.alpha_tags.map(t => t.replace(/_/g, ' ').toUpperCase()).join(' • ') : ''}</span>
+              </div>
+            ` : ''}
           </div>
         </td>
         <td>
@@ -980,10 +1114,129 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // --- Sales Ledger & Manual Entry Modal Logic ---
+  if (viewSalesLedgerBtn) {
+    viewSalesLedgerBtn.addEventListener("click", () => {
+      fetchSales();
+      salesLedgerModal.classList.add("open");
+    });
+  }
+  if (closeSalesLedgerModalBtn) {
+    closeSalesLedgerModalBtn.addEventListener("click", () => salesLedgerModal.classList.remove("open"));
+  }
+
+  // Open Record Sale Modal
+  if (openRecordSaleBtn) {
+    openRecordSaleBtn.addEventListener("click", () => {
+      if (saleCardSelect) {
+        saleCardSelect.innerHTML = '<option value="">-- Choose active staged card --</option>';
+        cards.forEach(c => {
+          if (c.status !== "SOLD") {
+            const opt = document.createElement("option");
+            opt.value = c.sku;
+            opt.textContent = `${c.sku} - ${c.title} ($${c.list_price})`;
+            saleCardSelect.appendChild(opt);
+          }
+        });
+      }
+      if (manualSaleDate) manualSaleDate.value = new Date().toISOString().split('T')[0];
+      recordSaleModal.classList.add("open");
+    });
+  }
+  if (closeRecordSaleModalBtn) {
+    closeRecordSaleModalBtn.addEventListener("click", () => recordSaleModal.classList.remove("open"));
+  }
+
+  if (saleCardSelect) {
+    saleCardSelect.addEventListener("change", (e) => {
+      const selected = cards.find(c => c.sku === e.target.value);
+      if (selected) {
+        manualSaleSku.value = selected.sku;
+        manualSalePrice.value = selected.list_price ? selected.list_price.toFixed(2) : "100.00";
+      }
+    });
+  }
+
+  // Submit Manual Sale
+  if (submitManualSaleBtn) {
+    submitManualSaleBtn.addEventListener("click", async () => {
+      const price = parseFloat(manualSalePrice.value);
+      if (isNaN(price) || price <= 0) {
+        alert("Please enter a valid realized sold price.");
+        return;
+      }
+
+      submitManualSaleBtn.disabled = true;
+      submitManualSaleBtn.textContent = "Recording Liquidation...";
+
+      try {
+        const res = await fetch("/api/sales/manual-entry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sku: manualSaleSku.value.trim() || undefined,
+            order_id: manualSaleOrderId.value.trim() || undefined,
+            realized_price: price,
+            shipping_charged: parseFloat(manualSaleShipping.value) || 5.0,
+            buyer_handle: manualSaleBuyer.value.trim() || "ebay_buyer",
+            sold_date: manualSaleDate.value || undefined,
+            ship_by_date: manualSaleShipBy.value.trim() || "Within 2 business days"
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          recordSaleModal.classList.remove("open");
+          await fetchSales();
+          await fetchCards();
+          alert(`Sale recorded successfully! Net Payout: $${data.sale.net_payout.toFixed(2)} | House Alpha: +${data.sale.alpha_vs_comp_pct.toFixed(1)}%`);
+        } else {
+          alert("Error recording sale: " + (data.detail || "Server error"));
+        }
+      } catch (err) {
+        alert("Failed to record sale: " + err.message);
+      } finally {
+        submitManualSaleBtn.disabled = false;
+        submitManualSaleBtn.textContent = "Record Liquidation & Update Alpha";
+      }
+    });
+  }
+
+  // Sync Sales from Email
+  async function triggerSalesSync() {
+    if (syncSalesBtn) syncSalesBtn.disabled = true;
+    if (ledgerSyncSalesBtn) ledgerSyncSalesBtn.disabled = true;
+    if (syncSalesText) syncSalesText.textContent = "Syncing...";
+
+    try {
+      const res = await fetch("/api/sync-sales", { method: "POST" });
+      const data = await res.json();
+      if (data.status === "success") {
+        await fetchSales();
+        await fetchCards();
+        alert(data.message || `Processed ${data.processed_count} new sales!`);
+      } else if (data.status === "config_required") {
+        alert(data.message || "Email sync credentials required. You can record sales manually anytime using '+ Record Sale'.");
+      } else {
+        alert("Sync warning: " + (data.message || "Failed to sync emails."));
+      }
+    } catch (err) {
+      alert("Email sync failed: " + err.message);
+    } finally {
+      if (syncSalesBtn) syncSalesBtn.disabled = false;
+      if (ledgerSyncSalesBtn) ledgerSyncSalesBtn.disabled = false;
+      if (syncSalesText) syncSalesText.textContent = "Sync Sales";
+    }
+  }
+
+  if (syncSalesBtn) syncSalesBtn.addEventListener("click", triggerSalesSync);
+  if (ledgerSyncSalesBtn) ledgerSyncSalesBtn.addEventListener("click", triggerSalesSync);
+
   // Close modals on clicking outside drawer/card
   window.addEventListener("click", (e) => {
     if (e.target === challengeModal) closeChallengeModal();
     if (e.target === exportModal) exportModal.classList.remove("open");
     if (e.target === settingsModal) settingsModal.classList.remove("open");
+    if (e.target === salesLedgerModal) salesLedgerModal.classList.remove("open");
+    if (e.target === recordSaleModal) recordSaleModal.classList.remove("open");
   });
 });

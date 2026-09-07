@@ -1,0 +1,80 @@
+[
+  {
+    "order_id": "01-14920-88123",
+    "sku": "DIS-RAYA-174-PSA10",
+    "title": "2023 Kakawow Disney 100 Raya Gold /50 PSA 10",
+    "player": "Raya",
+    "set": "Kakawow Disney 100",
+    "print_run": 50,
+    "is_bookend": false,
+    "base_comp_est": 200.0,
+    "suggested_bin": 249.99,
+    "realized_price": 249.99,
+    "shipping_charged": 5.0,
+    "ebay_fee_est": 33.42,
+    "net_payout": 216.57,
+    "alpha_vs_comp_pct": 25.0,
+    "alpha_vs_bin_pct": 0.0,
+    "tags": [
+      "non_sport_gem",
+      "disney",
+      "gold_50"
+    ],
+    "sold_date": "2026-09-04",
+    "buyer_handle": "disney_vault_ca",
+    "ship_by_date": "2026-09-08",
+    "front_url": "/assets/9_6_28_upload/DIS-RAYA-174-PSA10-FRONT.jpg"
+  },
+  {
+    "order_id": "01-15033-44910",
+    "sku": "MUN-BADGE-199-PSA9",
+    "title": "2023-24 Topps Chrome Man United Club Crest Badge 25/25 PSA 9",
+    "player": "Club Crest Badge",
+    "set": "Topps Chrome Manchester United",
+    "print_run": 25,
+    "is_bookend": true,
+    "base_comp_est": 70.0,
+    "suggested_bin": 89.99,
+    "realized_price": 105.99,
+    "shipping_charged": 5.0,
+    "ebay_fee_est": 14.34,
+    "net_payout": 91.65,
+    "alpha_vs_comp_pct": 51.41,
+    "alpha_vs_bin_pct": 17.78,
+    "tags": [
+      "crest_badge",
+      "bookend",
+      "low_print_le_25"
+    ],
+    "sold_date": "2026-09-05",
+    "buyer_handle": "reddevils_collector",
+    "ship_by_date": "2026-09-09",
+    "front_url": "/assets/9_6_28_upload/MUN-BADGE-199-PSA9-FRONT.jpg"
+  },
+  {
+    "order_id": "01-15150-07539",
+    "sku": "RMA-ATHENEA-AD-PSA9",
+    "title": "2023-24 Topps Chrome UWCL Athenea Del Castillo Auto /15 PSA 9",
+    "player": "Athenea del Castillo",
+    "set": "Topps Chrome UWCL",
+    "print_run": 15,
+    "is_bookend": false,
+    "base_comp_est": 55.0,
+    "suggested_bin": 69.99,
+    "realized_price": 100.0,
+    "shipping_charged": 5.0,
+    "ebay_fee_est": 13.55,
+    "net_payout": 86.44,
+    "alpha_vs_comp_pct": 81.82,
+    "alpha_vs_bin_pct": 42.88,
+    "tags": [
+      "uwcl",
+      "auto",
+      "low_print_le_15"
+    ],
+    "sold_date": "2026-09-06",
+    "buyer_handle": "madridista_cards",
+    "ship_by_date": "2026-09-10",
+    "front_url": "/assets/9_6_28_upload/RMA-ATHENEA-AD-PSA9-FRONT.jpg"
+  }
+]
