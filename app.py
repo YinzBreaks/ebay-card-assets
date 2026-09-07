@@ -133,6 +133,57 @@ def save_settings(settings):
 
 _in_memory_cards = None
 
+def deduplicate_cards_list(cards: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Intelligently unifies duplicate card entries sharing the same cert_number or SKU, merging front & back images."""
+    if not cards:
+        return []
+    seen_certs = {}
+    seen_skus = {}
+    deduped = []
+    for c in cards:
+        cert = str(c.get("cert_number") or "").strip()
+        sku = str(c.get("sku") or "").strip()
+        match = None
+        if cert and cert in seen_certs:
+            match = seen_certs[cert]
+        elif sku and sku in seen_skus:
+            match = seen_skus[sku]
+
+        if match:
+            # Merge image assets: if match is missing a distinct back_url or if c has it
+            match_front = match.get("front_url")
+            match_back = match.get("back_url")
+            c_front = c.get("front_url")
+            c_back = c.get("back_url")
+            
+            # If match back is missing or identical to front, adopt c's image as back
+            if (not match_back or match_back == match_front) and c_front and c_front != match_front:
+                match["back_url"] = c_front
+                match["back_cdn"] = c.get("front_cdn") or match.get("back_cdn")
+            elif (not match_back or match_back == match_front) and c_back and c_back != match_front:
+                match["back_url"] = c_back
+                match["back_cdn"] = c.get("back_cdn") or match.get("back_cdn")
+
+            # If match front is empty or placeholder and c has a valid front
+            if not match_front and c_front:
+                match["front_url"] = c_front
+                match["front_thumb"] = c.get("front_thumb") or match.get("front_thumb")
+                match["front_cdn"] = c.get("front_cdn") or match.get("front_cdn")
+
+            # Retain higher status (APPROVED > COMPED)
+            if c.get("status") == "APPROVED" and match.get("status") != "APPROVED":
+                match["status"] = "APPROVED"
+            if c.get("status") == "LISTED":
+                match["status"] = "LISTED"
+        else:
+            if cert:
+                seen_certs[cert] = c
+            if sku:
+                seen_skus[sku] = c
+            deduped.append(c)
+    return deduped
+
+
 def get_cards() -> List[Dict[str, Any]]:
     global _in_memory_cards
     if _in_memory_cards is not None:
@@ -144,13 +195,14 @@ def get_cards() -> List[Dict[str, Any]]:
                 with open(path, "r", encoding="utf-8") as f:
                     cards = json.load(f)
                     if cards:
-                        _in_memory_cards = cards
-                        return cards
+                        _in_memory_cards = deduplicate_cards_list(cards)
+                        return _in_memory_cards
             except Exception:
                 pass
 
     # Pre-seed from existing ebay_upload.csv if cards.json is empty
     cards = seed_cards_from_csv()
+    cards = deduplicate_cards_list(cards)
     save_cards(cards)
     _in_memory_cards = cards
     return cards
@@ -158,6 +210,7 @@ def get_cards() -> List[Dict[str, Any]]:
 
 def save_cards(cards: List[Dict[str, Any]]):
     global _in_memory_cards
+    cards = deduplicate_cards_list(cards)
     _in_memory_cards = cards
     for path in [CARDS_FILE, TMP_CARDS_FILE]:
         try:
@@ -1214,10 +1267,20 @@ async def upload_card(
     elif front and hasattr(front, "filename") and front.filename:
         filename_to_check = front.filename
 
+    is_back_image = False
+    if filename_to_check:
+        if re.search(r'[-_\s](?:back|b|rear|reverse|2)\.[^.]+$', filename_to_check, re.IGNORECASE):
+            is_back_image = True
+
     if not cert_number and not cert_extracted and filename_to_check:
         m_fname = re.search(r'(?:PSA[-_]?)?(\d{7,10})', filename_to_check, re.IGNORECASE)
         if m_fname:
             cert_extracted = m_fname.group(1)
+
+    # Modern PSA slabs have QR code on the REVERSE (back) of the slab
+    if not is_back_image and cert_extracted and file and not front:
+        # If QR code was detected on slab label, it's typically the back of a modern slab
+        is_back_image = True
 
     detected_cert = cert_number or cert_extracted or str(uuid.uuid4().int)[:9]
     known_info = KNOWN_PSA_CERTS.get(detected_cert)
@@ -1307,17 +1370,10 @@ async def upload_card(
     final_front = f"{sku}-FRONT.jpg"
     final_back = f"{sku}-BACK.jpg"
 
-    # Save images safely with high quality (95)
-    front_path = os.path.join(upload_batch_dir, final_front)
-    back_path = os.path.join(upload_batch_dir, final_back)
-    try:
-        front_pil.save(front_path, format="JPEG", quality=95)
-    except Exception:
-        pass
-    try:
-        back_pil.save(back_path, format="JPEG", quality=95)
-    except Exception:
-        pass
+    settings = load_settings()
+    cdn = settings.get("cdn_prefix", CDN_BASE_URL)
+    front_cdn_url = f"{cdn}/assets/9_6_28_upload/{final_front}"
+    back_cdn_url = f"{cdn}/assets/9_6_28_upload/{final_back}"
 
     # Generate high-resolution base64 thumbnail (360x500 at 90% quality)
     front_thumb_data = ""
@@ -1329,6 +1385,64 @@ async def upload_card(
         front_thumb_data = "data:image/jpeg;base64," + base64.b64encode(thumb_buf.getvalue()).decode()
     except Exception:
         pass
+
+    # Check if this card already exists in cards inventory (by cert_number or SKU)
+    cards = get_cards()
+    existing_card = None
+    for c in cards:
+        if c.get("cert_number") == detected_cert or c.get("sku") == sku:
+            existing_card = c
+            break
+
+    # If already exists, INTELLIGENTLY MERGE front & back images without duplicating!
+    if existing_card:
+        card_sku = existing_card.get("sku") or sku
+        card_front_name = f"{card_sku}-FRONT.jpg"
+        card_back_name = f"{card_sku}-BACK.jpg"
+
+        if is_back_image:
+            # Incoming image is the BACK
+            back_path = os.path.join(upload_batch_dir, card_back_name)
+            try:
+                front_pil.save(back_path, format="JPEG", quality=95)
+            except Exception:
+                pass
+            existing_card["back_url"] = f"/assets/9_6_28_upload/{card_back_name}"
+            existing_card["back_cdn"] = f"{cdn}/assets/9_6_28_upload/{card_back_name}"
+        else:
+            # Incoming image is the FRONT
+            front_path = os.path.join(upload_batch_dir, card_front_name)
+            try:
+                front_pil.save(front_path, format="JPEG", quality=95)
+            except Exception:
+                pass
+            existing_card["front_url"] = f"/assets/9_6_28_upload/{card_front_name}"
+            existing_card["front_thumb"] = front_thumb_data
+            existing_card["front_cdn"] = f"{cdn}/assets/9_6_28_upload/{card_front_name}"
+
+        save_cards(cards)
+        return {"status": "success", "card": existing_card, "merged": True}
+
+    # New card creation: Save images safely with high quality (95)
+    front_path = os.path.join(upload_batch_dir, final_front)
+    back_path = os.path.join(upload_batch_dir, final_back)
+
+    if is_back_image and not (front and back):
+        # We only have back photo initially
+        try:
+            front_pil.save(back_path, format="JPEG", quality=95)
+            front_pil.save(front_path, format="JPEG", quality=95)
+        except Exception:
+            pass
+    else:
+        try:
+            front_pil.save(front_path, format="JPEG", quality=95)
+        except Exception:
+            pass
+        try:
+            back_pil.save(back_path, format="JPEG", quality=95)
+        except Exception:
+            pass
 
     calibrated = calculate_calibrated_pricing(
         base_comp=base,
@@ -1345,11 +1459,6 @@ async def upload_card(
     list_price = calibrated["list_price"]
     auto_accept = calibrated["auto_accept"]
     min_offer = calibrated["min_offer"]
-
-    settings = load_settings()
-    cdn = settings.get("cdn_prefix", CDN_BASE_URL)
-    front_cdn_url = f"{cdn}/assets/9_6_28_upload/{final_front}"
-    back_cdn_url = f"{cdn}/assets/9_6_28_upload/{final_back}"
 
     if custom_justification:
         justification = custom_justification
@@ -1394,12 +1503,66 @@ async def upload_card(
     }
 
     cards = get_cards()
-    # Replace existing if same SKU or append to top
-    cards = [c for c in cards if c.get("sku") != sku]
+    # Replace existing if same SKU or cert_number
+    cards = [c for c in cards if c.get("sku") != sku and c.get("cert_number") != detected_cert]
     cards.insert(0, new_card)
     save_cards(cards)
 
     return {"status": "success", "card": new_card}
+
+
+@app.post("/api/cards/{sku}/swap-images")
+def swap_card_images(sku: str):
+    """Swaps the front and back images for a card slab (inverts in-memory URLs and physical files)."""
+    cards = get_cards()
+    target = None
+    for c in cards:
+        if c.get("sku") == sku:
+            target = c
+            break
+    if not target:
+        raise HTTPException(status_code=404, detail=f"Card {sku} not found")
+
+    old_front_url = target.get("front_url")
+    old_back_url = target.get("back_url")
+    old_front_cdn = target.get("front_cdn")
+    old_back_cdn = target.get("back_cdn")
+
+    target["front_url"] = old_back_url or old_front_url
+    target["back_url"] = old_front_url or old_back_url
+    target["front_cdn"] = old_back_cdn or old_front_cdn
+    target["back_cdn"] = old_front_cdn or old_back_cdn
+
+    # Physical file swap
+    front_fname = f"{sku}-FRONT.jpg"
+    back_fname = f"{sku}-BACK.jpg"
+    batch_dir = os.path.join(ASSETS_DIR, "9_6_28_upload")
+    p_front = os.path.join(batch_dir, front_fname)
+    p_back = os.path.join(batch_dir, back_fname)
+
+    if os.path.exists(p_front) and os.path.exists(p_back):
+        p_temp = os.path.join(batch_dir, f"{sku}-TEMP_{int(time.time())}.jpg")
+        try:
+            shutil.move(p_front, p_temp)
+            shutil.move(p_back, p_front)
+            shutil.move(p_temp, p_back)
+        except Exception:
+            pass
+
+    # Regenerate thumbnail from the new front file
+    if os.path.exists(p_front):
+        try:
+            with Image.open(p_front) as im:
+                thumb_buf = io.BytesIO()
+                im_c = im.copy()
+                im_c.thumbnail((360, 500), Image.Resampling.LANCZOS)
+                im_c.save(thumb_buf, format="JPEG", quality=90)
+                target["front_thumb"] = "data:image/jpeg;base64," + base64.b64encode(thumb_buf.getvalue()).decode()
+        except Exception:
+            pass
+
+    save_cards(cards)
+    return {"status": "success", "card": target}
 
 
 @app.post("/api/challenge")

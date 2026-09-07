@@ -502,11 +502,47 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Inspect & Challenge Modal Logic ---
+  function optimizeSearchQuery(card) {
+    if (!card) return "PSA 10";
+    let parts = [];
+    // Clean set: remove Series X, Non-Sport, Trading Cards
+    let set = (card.set || "").replace(/series\s*\d+/i, '').replace(/trading\s*cards/i, '').replace(/non-sport/i, '').trim();
+    if (set) parts.push(set);
+
+    // Subject / Player
+    if (card.player && card.player !== "Featured Subject" && card.player !== "Star Athlete") {
+      parts.push(card.player);
+    }
+
+    // Card # (strip leading # or No.)
+    if (card.card_number) {
+      const num = String(card.card_number).replace(/^[#№]/, '');
+      parts.push(`#${num}`);
+    }
+
+    // Parallel (e.g. Opal, Yellow Raywave, Mojo, Prizm, Refractor)
+    if (card.parallel) {
+      let cleanPar = card.parallel.replace(/\/\d+/g, '').replace(/gemstone/i, '').replace(/refractor/i, '').replace(/spec/i, '').trim();
+      if (cleanPar) parts.push(cleanPar);
+    }
+
+    // Grader & Grade
+    parts.push(`${card.grader || 'PSA'} ${card.grade || '10'}`);
+
+    let q = parts.join(' ').replace(/\s+/g, ' ').trim();
+    if (!q || q.length < 6) {
+      q = (card.title || "").replace(/GEM\s*MT/i, '').replace(/MINT/i, '').replace(/\/\d+/g, '').replace(/\s+/g, ' ').trim();
+    }
+    return q;
+  }
+
   function openChallengeModal(card) {
     currentCard = card;
-    modalCardTitle.textContent = card.title;
+    currentCardSku = card.sku;
+    challengeModal.classList.add("open");
+
     modalSkuCode.textContent = card.sku;
-    modalCertCode.textContent = `Cert #${card.cert_number || 'N/A'} • ${card.grader || 'PSA'} Grade ${card.grade || '10'}`;
+    modalCertCode.textContent = `Cert #${card.cert_number || 'N/A'} • ${card.grader || 'PSA'} ${card.grade || '10'}`;
 
     // High-resolution original photo priority (never blurry thumbnail)
     const frontSrc = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
@@ -530,9 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
       modalNavCounter.textContent = `Card ${displayIdx} of ${filtered.length}`;
     }
 
-    modalJustificationText.textContent = card.justification || "Market comps verified from recent historical sales.";
-
-    // Populate editable card identity inputs
+    // Editable card identity inputs
     const editTitle = document.getElementById("modalEditTitle");
     const editPlayer = document.getElementById("modalEditPlayer");
     const editSet = document.getElementById("modalEditSet");
@@ -541,6 +575,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const editBaseComp = document.getElementById("modalEditBaseComp");
     const ebayLink = document.getElementById("modalEbaySoldLink");
     const p130Link = document.getElementById("modal130PointLink");
+    const psaCertLink = document.getElementById("modalPsaCertLink");
 
     if (editTitle) editTitle.value = card.title || "";
     if (editPlayer) editPlayer.value = card.player || "";
@@ -549,30 +584,105 @@ document.addEventListener("DOMContentLoaded", () => {
     if (editCert) editCert.value = card.cert_number || "";
     if (editBaseComp) editBaseComp.value = parseFloat(card.base_comp || (card.list_price / 1.15)).toFixed(2);
 
-    const cleanSearchQuery = (card.title || `${card.set || ''} ${card.player || ''} ${card.card_number || ''} ${card.grader || 'PSA'} ${card.grade || '10'}`).replace(/[^\w\s#/-]/g, ' ').trim();
-    if (ebayLink) ebayLink.href = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(cleanSearchQuery)}&LH_Sold=1&LH_Complete=1`;
-    if (p130Link) p130Link.href = `https://130point.com/cards/`;
+    const optQuery = optimizeSearchQuery(card);
+
+    // Optimized eBay Sold Comps URL (targeted keywords that eBay actually matches)
+    if (ebayLink) {
+      ebayLink.href = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(optQuery)}&LH_Sold=1&LH_Complete=1`;
+    }
+
+    // 130Point URL with clean query parameters + auto-copy to clipboard
+    if (p130Link) {
+      p130Link.href = `https://130point.com/sales/?query=${encodeURIComponent(optQuery)}`;
+      p130Link.onclick = () => {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(optQuery).then(() => {
+            showToast(`Copied search query to clipboard: "${optQuery}"`);
+          }).catch(() => {});
+        }
+      };
+    }
+
+    // Direct official PSA Cert verification link
+    if (psaCertLink) {
+      if (card.cert_number && /^\d{7,10}$/.test(String(card.cert_number).trim())) {
+        psaCertLink.style.display = "inline-flex";
+        psaCertLink.href = `https://www.psacard.com/cert/${card.cert_number}`;
+        psaCertLink.innerHTML = `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Verify PSA #${card.cert_number} ↗`;
+      } else {
+        psaCertLink.style.display = "none";
+      }
+    }
 
     modalListPrice.value = parseFloat(card.list_price || 0).toFixed(2);
     modalAutoAccept.value = parseFloat(card.auto_accept || 0).toFixed(2);
     modalMinOffer.value = parseFloat(card.min_offer || 0).toFixed(2);
     challengeFeedback.value = "";
 
-    // Populate comps table
+    // Rich Valuation Logic & Justification Grid
+    const baseCompVal = parseFloat(card.base_comp || (card.list_price / 1.15)).toFixed(2);
+    const listPriceVal = parseFloat(card.list_price || 0).toFixed(2);
+    const autoAcceptVal = parseFloat(card.auto_accept || (card.list_price * 0.85)).toFixed(2);
+    const minFloorVal = parseFloat(card.min_offer || (card.list_price * 0.75)).toFixed(2);
+
+    modalJustificationText.innerHTML = `
+      <div style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin-bottom: 8px;">
+        ${card.justification || 'Market comps verified from recent historical sales and PSA population.'}
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 6px;">
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Base Comp Median</span>
+          <strong style="font-size: 13px; color: #fff; font-family: var(--font-mono);">$${baseCompVal}</strong>
+        </div>
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Target BIN (List)</span>
+          <strong style="font-size: 13px; color: var(--psa-gold); font-family: var(--font-mono);">$${listPriceVal}</strong>
+        </div>
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Auto-Accept (Offers)</span>
+          <strong style="font-size: 13px; color: #4ade80; font-family: var(--font-mono);">$${autoAcceptVal}</strong>
+        </div>
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Hard Stop Floor</span>
+          <strong style="font-size: 13px; color: #f87171; font-family: var(--font-mono);">$${minFloorVal}</strong>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 10px; color: var(--text-muted);">Optimized Search Query:</span>
+        <code style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #38bdf8;">${optQuery}</code>
+        <button type="button" class="btn btn-secondary btn-xs" style="font-size: 10px; padding: 2px 6px;" onclick="if (navigator.clipboard) { navigator.clipboard.writeText('${optQuery.replace(/'/g, "\\'")}'); showToast('Search query copied!'); }">Copy Query</button>
+      </div>
+    `;
+
+    // Populate comps table with clickable links
     modalCompsBody.innerHTML = "";
     const comps = card.comps || [
       { date: "3 days ago", platform: "eBay Sold", price: (card.list_price * 0.95).toFixed(2), grade: `${card.grader} ${card.grade}` },
-      { date: "1 week ago", platform: "PWCC Premier", price: (card.list_price * 1.02).toFixed(2), grade: `${card.grader} ${card.grade}` },
+      { date: "1 week ago", platform: "130Point / PWCC", price: (card.list_price * 1.02).toFixed(2), grade: `${card.grader} ${card.grade}` },
       { date: "2 weeks ago", platform: "Goldin", price: (card.list_price * 0.92).toFixed(2), grade: `${card.grader} ${card.grade}` }
     ];
 
     comps.forEach(c => {
       const row = document.createElement("tr");
+      const is130 = c.platform && c.platform.toLowerCase().includes("130point");
+      const rowCompLink = is130
+        ? `https://130point.com/sales/?query=${encodeURIComponent(optQuery)}`
+        : `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(optQuery)}&LH_Sold=1&LH_Complete=1`;
+
       row.innerHTML = `
-        <td><strong>${c.platform}</strong></td>
+        <td>
+          <a href="${rowCompLink}" target="_blank" style="color: var(--psa-gold); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Search ${c.platform} for this card">
+            <strong>${c.platform}</strong>
+            <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+        </td>
         <td style="color: var(--text-muted);">${c.date}</td>
         <td><span class="grade-badge badge-psa-9" style="font-size: 10px;">${c.grade}</span></td>
-        <td style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: #fff;">$${parseFloat(c.price).toFixed(2)}</td>
+        <td style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: #fff;">
+          <a href="${rowCompLink}" target="_blank" style="color: inherit; text-decoration: none;" title="Search comp proof">
+            $${parseFloat(c.price).toFixed(2)} ↗
+          </a>
+        </td>
       `;
       modalCompsBody.appendChild(row);
     });
@@ -690,6 +800,36 @@ document.addEventListener("DOMContentLoaded", () => {
     flipToggleBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       modalFlipCard.classList.toggle("flipped");
+    });
+  }
+
+  const swapFrontBackPermanentBtn = document.getElementById("swapFrontBackPermanentBtn");
+  if (swapFrontBackPermanentBtn) {
+    swapFrontBackPermanentBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (!currentCard) return;
+      const sku = currentCard.sku;
+      swapFrontBackPermanentBtn.disabled = true;
+      swapFrontBackPermanentBtn.textContent = "Swapping...";
+      try {
+        const res = await fetch(`/api/cards/${sku}/swap-images`, { method: "POST" });
+        const data = await res.json();
+        if (data.status === "success") {
+          currentCard = data.card;
+          const idx = cards.findIndex(c => c.sku === sku);
+          if (idx !== -1) cards[idx] = data.card;
+          openChallengeModal(data.card);
+          renderTable();
+          showToast("Front and back images inverted successfully!");
+        } else {
+          alert("Failed to swap images: " + (data.detail || "Error"));
+        }
+      } catch (err) {
+        alert("Network error swapping images: " + err.message);
+      } finally {
+        swapFrontBackPermanentBtn.disabled = false;
+        swapFrontBackPermanentBtn.textContent = "🔄 Swap Front & Back";
+      }
     });
   }
 
@@ -1088,65 +1228,163 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleFilesSelected(filesList) {
     if (!filesList || filesList.length === 0) return;
     const files = Array.from(filesList);
-    const mode = document.querySelector("input[name='uploadMode']:checked").value;
 
-    if (mode === "dual") {
-      files.forEach(file => {
-        if (!uploadQueue.some(item => item.file && item.file.name === file.name && item.file.size === file.size)) {
-          uploadQueue.push({
-            mode: 'dual',
-            file: file,
-            name: file.name,
-            size: file.size
-          });
-        }
-      });
-    } else {
-      // Separate Front & Back Mode
-      const frontRegex = /[-_](?:front|f|1)\.[^.]+$/i;
-      const backRegex = /[-_](?:back|b|2)\.[^.]+$/i;
-
-      const fronts = files.filter(f => frontRegex.test(f.name));
-      const backs = files.filter(f => backRegex.test(f.name));
-
-      if (fronts.length > 0 && backs.length > 0) {
-        fronts.forEach(front => {
-          const stem = front.name.replace(frontRegex, '');
-          const matchingBack = backs.find(b => b.name.replace(backRegex, '') === stem);
-          uploadQueue.push({
-            mode: 'separate',
-            front: front,
-            back: matchingBack || null,
-            name: matchingBack ? `${front.name} + ${matchingBack.name}` : front.name,
-            size: front.size + (matchingBack ? matchingBack.size : 0)
-          });
+    // If single file dropped and mode is dual, keep dual
+    if (files.length === 1) {
+      const mode = document.querySelector("input[name='uploadMode']:checked").value;
+      if (mode === "dual") {
+        uploadQueue.push({
+          mode: 'dual',
+          file: files[0],
+          name: files[0].name,
+          size: files[0].size
         });
-        const matchedNames = new Set(uploadQueue.map(q => q.front?.name).concat(uploadQueue.map(q => q.back?.name)));
-        const remaining = files.filter(f => !matchedNames.has(f.name));
-        for (let i = 0; i < remaining.length; i += 2) {
-          const f1 = remaining[i];
-          const f2 = remaining[i + 1] || null;
-          uploadQueue.push({
-            mode: 'separate',
-            front: f1,
-            back: f2,
-            name: f2 ? `${f1.name} + ${f2.name}` : f1.name,
-            size: f1.size + (f2 ? f2.size : 0)
-          });
-        }
       } else {
-        // Sequential pairing: 2 photos per slab
-        for (let i = 0; i < files.length; i += 2) {
-          const f1 = files[i];
-          const f2 = files[i + 1] || null;
-          uploadQueue.push({
-            mode: 'separate',
-            front: f1,
-            back: f2,
-            name: f2 ? `${f1.name} + ${f2.name}` : f1.name,
-            size: f1.size + (f2 ? f2.size : 0)
-          });
+        uploadQueue.push({
+          mode: 'separate',
+          front: files[0],
+          back: null,
+          name: files[0].name,
+          size: files[0].size
+        });
+      }
+      updateUploadBatchUI();
+      return;
+    }
+
+    // MULTIPLE FILES DROPPED: Automatically analyze and pair fronts & backs
+    const frontRegex = /[-_\s](?:front|f|1|recto|obverse)\.[^.]+$/i;
+    const backRegex = /[-_\s](?:back|b|2|verso|rear|reverse)\.[^.]+$/i;
+    const certRegex = /(?:PSA[-_]?)?(\d{7,10})/i;
+
+    // Map files with metadata
+    const parsedFiles = files.map(f => {
+      const certMatch = f.name.match(certRegex);
+      const isFront = frontRegex.test(f.name);
+      const isBack = backRegex.test(f.name);
+      let stem = f.name.replace(frontRegex, '').replace(backRegex, '').replace(/\.[^.]+$/, '').trim();
+      return {
+        file: f,
+        name: f.name,
+        size: f.size,
+        cert: certMatch ? certMatch[1] : null,
+        isFront,
+        isBack,
+        stem
+      };
+    });
+
+    const used = new Set();
+
+    // 1. Pair by exact Cert Number match (e.g. 153466049_front.jpg and 153466049_back.jpg)
+    const certGroups = {};
+    parsedFiles.forEach((pf, idx) => {
+      if (pf.cert) {
+        if (!certGroups[pf.cert]) certGroups[pf.cert] = [];
+        certGroups[pf.cert].push(idx);
+      }
+    });
+
+    Object.keys(certGroups).forEach(cert => {
+      const indices = certGroups[cert].filter(i => !used.has(i));
+      while (indices.length >= 2) {
+        const idx1 = indices.shift();
+        const idx2 = indices.shift();
+        used.add(idx1);
+        used.add(idx2);
+
+        let pf1 = parsedFiles[idx1];
+        let pf2 = parsedFiles[idx2];
+        let frontPf = pf1;
+        let backPf = pf2;
+
+        if (pf1.isBack || pf2.isFront) {
+          frontPf = pf2;
+          backPf = pf1;
         }
+
+        uploadQueue.push({
+          mode: 'separate',
+          front: frontPf.file,
+          back: backPf.file,
+          cert: cert,
+          name: `${frontPf.name} + ${backPf.name}`,
+          size: frontPf.size + backPf.size
+        });
+      }
+    });
+
+    // 2. Pair by identical Stem match (e.g. haaland-1.jpg and haaland-2.jpg)
+    const stemGroups = {};
+    parsedFiles.forEach((pf, idx) => {
+      if (!used.has(idx) && pf.stem) {
+        if (!stemGroups[pf.stem]) stemGroups[pf.stem] = [];
+        stemGroups[pf.stem].push(idx);
+      }
+    });
+
+    Object.keys(stemGroups).forEach(stem => {
+      const indices = stemGroups[stem].filter(i => !used.has(i));
+      while (indices.length >= 2) {
+        const idx1 = indices.shift();
+        const idx2 = indices.shift();
+        used.add(idx1);
+        used.add(idx2);
+
+        let pf1 = parsedFiles[idx1];
+        let pf2 = parsedFiles[idx2];
+        let frontPf = pf1;
+        let backPf = pf2;
+
+        if (pf1.isBack || pf2.isFront) {
+          frontPf = pf2;
+          backPf = pf1;
+        }
+
+        uploadQueue.push({
+          mode: 'separate',
+          front: frontPf.file,
+          back: backPf.file,
+          cert: frontPf.cert || backPf.cert,
+          name: `${frontPf.name} + ${backPf.name}`,
+          size: frontPf.size + backPf.size
+        });
+      }
+    });
+
+    // 3. Sequential pairing for remaining files (dealers photograph Front, Back, Front, Back)
+    const remainingIndices = parsedFiles.map((_, i) => i).filter(i => !used.has(i));
+    for (let i = 0; i < remainingIndices.length; i += 2) {
+      const idx1 = remainingIndices[i];
+      const idx2 = remainingIndices[i + 1];
+      const pf1 = parsedFiles[idx1];
+      const pf2 = idx2 !== undefined ? parsedFiles[idx2] : null;
+
+      if (pf2) {
+        let frontPf = pf1;
+        let backPf = pf2;
+        if (pf1.isBack || pf2.isFront) {
+          frontPf = pf2;
+          backPf = pf1;
+        }
+        uploadQueue.push({
+          mode: 'separate',
+          front: frontPf.file,
+          back: backPf.file,
+          cert: frontPf.cert || backPf.cert,
+          name: `${frontPf.name} + ${backPf.name}`,
+          size: frontPf.size + backPf.size
+        });
+      } else {
+        // Solitary file left
+        uploadQueue.push({
+          mode: 'separate',
+          front: pf1.file,
+          back: null,
+          cert: pf1.cert,
+          name: pf1.name,
+          size: pf1.size
+        });
       }
     }
 
@@ -1174,20 +1412,40 @@ document.addEventListener("DOMContentLoaded", () => {
       batchCountBadge.textContent = `${uploadQueue.length} SLAB${uploadQueue.length > 1 ? 'S' : ''} QUEUED`;
     }
     if (batchDetailText) {
-      if (uploadQueue.length === 1) {
-        batchDetailText.textContent = `${uploadQueue[0].name} (${totalMb} MB) ready for ingestion`;
-      } else {
-        batchDetailText.textContent = `${uploadQueue.length} slabs ready (${totalMb} MB total) • Auto-splitting & Comping`;
-      }
+      let detailHtml = `<strong>${uploadQueue.length} slab(s) ready (${totalMb} MB)</strong>: `;
+      const pairTags = uploadQueue.map((q, idx) => {
+        if (q.mode === 'separate') {
+          const fName = q.front ? q.front.name : 'Missing Front';
+          const bName = q.back ? q.back.name : 'Missing Back';
+          return `<span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; margin: 2px; font-size: 11px;">
+            <span style="color:#4ade80; font-weight:700;">[FRONT]</span> ${fName} ↔ <span style="color:#38bdf8; font-weight:700;">[BACK]</span> ${bName}
+            <button type="button" class="btn btn-xs btn-outline-warning swap-queue-item-btn" data-idx="${idx}" style="font-size:9px; padding: 1px 4px; margin-left:4px;">🔄 Swap</button>
+          </span>`;
+        } else {
+          return `<span style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; margin: 2px; font-size: 11px;">${q.name} (Dual-Shot)</span>`;
+        }
+      }).join(' ');
+      batchDetailText.innerHTML = detailHtml + pairTags;
+
+      // Wire swap buttons in batchPreviewBar
+      document.querySelectorAll(".swap-queue-item-btn").forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.idx);
+          if (uploadQueue[idx] && uploadQueue[idx].mode === 'separate') {
+            const temp = uploadQueue[idx].front;
+            uploadQueue[idx].front = uploadQueue[idx].back;
+            uploadQueue[idx].back = temp;
+            uploadQueue[idx].name = `${uploadQueue[idx].front?.name || 'Missing'} + ${uploadQueue[idx].back?.name || 'Missing'}`;
+            updateUploadBatchUI();
+          }
+        };
+      });
     }
 
     const dropTitle = document.querySelector(".drop-text h3");
     if (dropTitle) {
-      if (uploadQueue.length === 1) {
-        dropTitle.innerHTML = `Queued: <strong>${uploadQueue[0].name}</strong> (${totalMb} MB)`;
-      } else {
-        dropTitle.innerHTML = `Queued: <strong>${uploadQueue.length} card slabs</strong> (${totalMb} MB total)`;
-      }
+      dropTitle.innerHTML = `Queued: <strong>${uploadQueue.length} card slab(s)</strong> (${totalMb} MB total) • Fronts & Backs Paired`;
     }
 
     processUploadBtn.innerHTML = `<span>Process & Comp ${uploadQueue.length} Slab${uploadQueue.length > 1 ? 's' : ''}</span>`;
@@ -1224,7 +1482,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (item.mode === "dual") {
         formData.append("file", item.file);
       } else {
-        formData.append("front", item.front);
+        if (item.front) formData.append("front", item.front);
         if (item.back) formData.append("back", item.back);
       }
 
@@ -1241,6 +1499,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const certMatch = rawName.match(/(?:PSA[-_]?)?(\d{7,10})/i);
       if (certMatch) {
         formData.append("cert_number", certMatch[1]);
+      } else if (item.cert) {
+        formData.append("cert_number", item.cert);
       }
 
       try {
@@ -1251,7 +1511,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
         if (data.status === "success") {
           data.card._justAdded = true;
-          cards.unshift(data.card);
+          // Deduplicate in cards array: update existing record if same SKU or cert, else unshift
+          const existingIdx = cards.findIndex(c => c.sku === data.card.sku || (c.cert_number && c.cert_number === data.card.cert_number));
+          if (existingIdx !== -1) {
+            cards[existingIdx] = data.card;
+          } else {
+            cards.unshift(data.card);
+          }
           renderTable();
           updateKPIs();
           successCount++;
@@ -1280,13 +1546,8 @@ document.addEventListener("DOMContentLoaded", () => {
       updateUploadBatchUI();
       processUploadBtn.disabled = false;
       processUploadBtn.innerHTML = "<span>Process & Comp</span>";
-      if (successCount === 1 && lastAddedCard) {
+      if (lastAddedCard) {
         openChallengeModal(lastAddedCard);
-      } else if (successCount > 1) {
-        const pendingPill = document.querySelector(".filter-pills .pill[data-filter='COMPED']");
-        if (pendingPill) pendingPill.click();
-        const tableCard = document.querySelector(".table-card");
-        if (tableCard) tableCard.scrollIntoView({ behavior: "smooth" });
       }
     }, 500);
   });
