@@ -4,7 +4,9 @@ __pycache__/
 *$py.class
 
 # Generated Excel templates & large workbooks
+eBay_Bulk_Upload_Completed.xlsx
 *.xlsx
+!eBay-category-listing-template.xlsx
 
 # Temporary / upload response logs & generated output
 eBay_Bulk_Upload_Completed.csv
