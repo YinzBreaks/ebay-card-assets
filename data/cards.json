@@ -1,5 +1,22 @@
 [
   {
+    "sku": "CURR-NAKAMOTO-78-PSA10",
+    "title": "2025 Cardsmiths Currency Series 5 Satoshi Nakamoto #78 Opal Gemstone Refractor /45 PSA 10 GEM MT",
+    "player": "Satoshi Nakamoto",
+    "set": "Currency Series 5",
+    "card_number": "78",
+    "cert_number": "153466073",
+    "parallel": "Opal Gemstone Refractor",
+    "grader": "PSA",
+    "grade": "10",
+    "list_price": 300.0,
+    "base_comp": 260.87,
+    "auto_accept": 255.0,
+    "min_offer": 225.0,
+    "justification": "Challenged & Recalibrated: Target valuation capped at $300.00 max. Base comp: $260.87. Target BIN $300.00 (115%), Auto-Accept $255.00 (85%), Hard Floor $225.00 (75%). User note: \"I don't think this is correct. I cannot find any of the sales you mention. I'm seeing raw at $50. Currency is notoriously hard to gem, so I think this is probably 300 max\"",
+    "status": "CHALLENGED"
+  },
+  {
     "sku": "DIS-MIGUEL-171-PSA10",
     "title": "2024 Topps Chrome Disney Miguel #171 Black & White Speckle /101 PSA 10 GEM MT",
     "player": "Miguel",

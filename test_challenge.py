@@ -66,4 +66,23 @@ assert c6['list_price'] == 200.0, f"Expected 200.0, got {c6['list_price']}"
 assert c6['auto_accept'] == 170.0, f"Expected 170.0, got {c6['auto_accept']}"
 assert c6['min_offer'] == 150.0, f"Expected 150.0, got {c6['min_offer']}"
 
-print('ALL CALIBRATION ENGINE TESTS PASSED PERFECTLY!')
+# Test 7: Complex user market intelligence with explicit cap & card_data fallback
+r7 = requests.post(f'{base}/api/challenge', json={
+    'sku': 'CURR-NAKAMOTO-78-PSA10',
+    'feedback': "I don't think this is correct. I cannot find any of the sales you mention. I'm seeing raw at $50. Currency is notoriously hard to gem, so I think this is probably 300 max",
+    'base_comp': 350.0,
+    'card_data': {
+        'sku': 'CURR-NAKAMOTO-78-PSA10',
+        'title': '2025 Cardsmiths Currency Series 5 Satoshi Nakamoto #78 Opal Gemstone Refractor /45 PSA 10 GEM MT',
+        'list_price': 402.50,
+        'base_comp': 350.0
+    }
+})
+assert r7.status_code == 200, f"Test 7 failed: {r7.text}"
+c7 = r7.json()['card']
+print('Test 7 (Satoshi Feedback):', 'Base:', c7['base_comp'], 'List:', c7['list_price'], 'Auto:', c7['auto_accept'], 'Floor:', c7['min_offer'])
+assert c7['list_price'] == 300.0, f"Expected 300.0, got {c7['list_price']}"
+assert c7['auto_accept'] == 255.0, f"Expected 255.0, got {c7['auto_accept']}"
+assert c7['min_offer'] == 225.0, f"Expected 225.0, got {c7['min_offer']}"
+
+print('ALL 7 CALIBRATION ENGINE TESTS PASSED PERFECTLY!')

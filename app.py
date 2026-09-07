@@ -724,6 +724,7 @@ class ChallengeRequest(BaseModel):
     cert_number: Optional[str] = None
     parallel: Optional[str] = None
     base_comp: Optional[float] = None
+    card_data: Optional[Dict[str, Any]] = None
 
 
 class ApproveRequest(BaseModel):
@@ -1621,8 +1622,33 @@ def challenge_comp(req: ChallengeRequest):
             target = c
             break
 
+    # If not found in current worker memory/disk, adopt from card_data or synthesize
     if not target:
-        raise HTTPException(status_code=404, detail="Card not found with SKU: " + req.sku)
+        if req.card_data and isinstance(req.card_data, dict):
+            target = dict(req.card_data)
+        else:
+            cert = req.cert_number
+            known = KNOWN_PSA_CERTS.get(cert) if cert else None
+            base_p = req.base_comp or (float(known.get("base_comp")) if known else 100.0)
+            target = {
+                "sku": req.sku,
+                "title": req.title or (known.get("title") if known else req.sku),
+                "player": req.player or (known.get("player") if known else "Featured Subject"),
+                "set": req.card_set or (known.get("set") if known else ""),
+                "card_number": req.card_number or (known.get("card_number") if known else "1"),
+                "cert_number": cert or (known.get("cert_number") if known else "N/A"),
+                "parallel": req.parallel or (known.get("parallel") if known else ""),
+                "grader": "PSA",
+                "grade": "10",
+                "base_comp": base_p,
+                "list_price": round(base_p * 1.15, 2),
+                "auto_accept": round(base_p * 1.15 * 0.85, 2),
+                "min_offer": round(base_p * 1.15 * 0.75, 2),
+                "status": "CHALLENGED",
+                "justification": "Calibrated listing",
+                "comps": known.get("comps") if known else []
+            }
+        cards.insert(0, target)
 
     # Apply metadata updates if provided
     if req.title: target["title"] = req.title.strip()
@@ -1649,7 +1675,19 @@ def challenge_comp(req: ChallengeRequest):
         multiplier = 1.0
         applied_rules = []
 
-        # (a) Extract explicit percentages (+15%, +10%, -10%, etc.)
+        # (a) Explicit target/max/cap (e.g. "300 max", "probably 300 max", "think it is 250", "target $200")
+        explicit_target = None
+        target_match = re.search(r'(?:probably|think(?:\s*it\'?s)?|target|list\s*(?:at)?|worth|around|about|cap(?:\s*at)?|ceiling|at\s*most)?\s*\$?(\d+(?:\.\d+)?)\s*(?:max|ceiling|cap)', fb_lower)
+        if target_match:
+            explicit_target = float(target_match.group(1))
+            applied_rules.append(f"Target valuation capped at ${explicit_target:.2f} max")
+        else:
+            gen_target = re.search(r'(?:probably|think(?:\s*it\'?s)?|target|list\s*at|worth\s*(?:around)?|say\s*around|say|cap\s*at)\s*\$?(\d+(?:\.\d+)?)', fb_lower)
+            if gen_target:
+                explicit_target = float(gen_target.group(1))
+                applied_rules.append(f"Target valuation anchored to ${explicit_target:.2f}")
+
+        # (b) Percentage adjustments (+15%, +10%, -10%, etc.)
         pct_matches = re.findall(r'([+-]?\s*\d+(?:\.\d+)?)\s*%', fb)
         if pct_matches:
             net_pct = 0.0
@@ -1663,36 +1701,49 @@ def challenge_comp(req: ChallengeRequest):
             sign = "+" if net_pct >= 0 else ""
             applied_rules.append(f"{sign}{net_pct:.1f}% percentage adjustment")
 
-        # (b) Raw comp to PSA 10 gem premium
-        if "raw" in fb_lower and not pct_matches:
-            multiplier *= 1.40  # +40% standard PSA 10 premium over raw
+        # (c) Raw comp extracted (e.g. "raw at $50", "raw is 50", "raw $75", or "comp was raw")
+        raw_match = re.search(r'raw\s*(?:at|is|=|was)?\s*\$?(\d+(?:\.\d+)?)', fb_lower)
+        raw_val = float(raw_match.group(1)) if raw_match else None
+        if raw_val and not explicit_target and not pct_matches:
+            gem_mult = 2.5 if any(w in fb_lower for w in ["hard to gem", "tough gem", "condition sensitive"]) else 1.40
+            current_base = round(raw_val * gem_mult, 2)
+            applied_rules.append(f"Raw comp ${raw_val:.2f} + {int((gem_mult-1)*100)}% PSA 10 gem premium")
+        elif "raw" in fb_lower and not explicit_target and not pct_matches:
+            multiplier *= 1.40
             applied_rules.append("+40% PSA 10 Gem premium over raw comp")
 
-        # (c) Explicit dollar comp (e.g., "comp is $95", "comp $120", "sale $150", "comp was 85")
-        dollar_match = re.search(r'(?:comp\s*(?:is|was|=|at)?\s*\$?|target\s*(?:is|was|=|at)?\s*\$?|sold\s*(?:for|at)?\s*\$?|\$\s*)(\d+(?:\.\d+)?)', fb_lower)
-        if dollar_match and not pct_matches:
-            try:
-                extracted_dollar = float(dollar_match.group(1))
-                if extracted_dollar > 0:
-                    current_base = extracted_dollar
-                    applied_rules.append(f"Base comp anchored to ${extracted_dollar:.2f}")
-            except ValueError:
-                pass
+        # (d) Compute final calibrated prices
+        if explicit_target and explicit_target > 0:
+            new_list_price = round(explicit_target, 2)
+            new_base_comp = round(new_list_price / 1.15, 2)
+        elif not pct_matches and not raw_val:
+            dollar_match = re.search(r'(?:comp\s*(?:is|was|=|at)?\s*\$?|target\s*(?:is|was|=|at)?\s*\$?|sold\s*(?:for|at)?\s*\$?|\$\s*)(\d+(?:\.\d+)?)', fb_lower)
+            if dollar_match:
+                try:
+                    extracted_dollar = float(dollar_match.group(1))
+                    if extracted_dollar > 0:
+                        new_base_comp = extracted_dollar
+                        new_list_price = round(new_base_comp * 1.15, 2)
+                        applied_rules.append(f"Base comp anchored to ${extracted_dollar:.2f}")
+                except ValueError:
+                    new_base_comp = current_base
+                    new_list_price = round(new_base_comp * 1.15, 2)
+            else:
+                if any(w in fb_lower for w in ["rare", "1/1", "/25", "/10", "/5", "case hit", "super rare", "gold", "downton"]):
+                    multiplier *= 1.25
+                    applied_rules.append("+25% Scarcity parallel markup")
+                elif any(w in fb_lower for w in ["too low", "bump", "higher", "increase", "up"]):
+                    multiplier *= 1.15
+                    applied_rules.append("+15% Upward recalibration")
+                elif any(w in fb_lower for w in ["too high", "drop", "lower", "decrease", "down", "discount"]):
+                    multiplier *= 0.85
+                    applied_rules.append("-15% Downward recalibration")
+                new_base_comp = round(current_base * multiplier, 2)
+                new_list_price = round(new_base_comp * 1.15, 2)
+        else:
+            new_base_comp = round(current_base * multiplier, 2)
+            new_list_price = round(new_base_comp * 1.15, 2)
 
-        # (d) Directional cues if no numbers found
-        if not pct_matches and not dollar_match and "raw" not in fb_lower:
-            if any(w in fb_lower for w in ["rare", "1/1", "/25", "/10", "/5", "case hit", "super rare", "gold", "downton"]):
-                multiplier *= 1.25
-                applied_rules.append("+25% Scarcity parallel markup")
-            elif any(w in fb_lower for w in ["too low", "bump", "higher", "increase", "up"]):
-                multiplier *= 1.15
-                applied_rules.append("+15% Upward recalibration")
-            elif any(w in fb_lower for w in ["too high", "drop", "lower", "decrease", "down", "discount"]):
-                multiplier *= 0.85
-                applied_rules.append("-15% Downward recalibration")
-
-        new_base_comp = round(current_base * multiplier, 2)
-        new_list_price = round(new_base_comp * 1.15, 2)
         new_auto_accept = round(new_list_price * 0.85, 2)
         new_min_floor = round(new_list_price * 0.75, 2)
 

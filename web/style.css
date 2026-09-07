@@ -1657,3 +1657,73 @@ body {
   color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
+
+/* CardFlow Toast Notification System */
+.cardflow-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: 420px;
+}
+
+.cardflow-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: rgba(14, 20, 34, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md, 10px);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 16px rgba(245, 158, 11, 0.15);
+  backdrop-filter: blur(14px);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+.cardflow-toast.toast-show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.cardflow-toast.toast-success {
+  border-left: 4px solid #10b981;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 16px rgba(16, 185, 129, 0.2);
+}
+
+.cardflow-toast.toast-error {
+  border-left: 4px solid #ef4444;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 16px rgba(239, 68, 68, 0.2);
+}
+
+.cardflow-toast.toast-warning {
+  border-left: 4px solid #f59e0b;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 16px rgba(245, 158, 11, 0.2);
+}
+
+.cardflow-toast.toast-info {
+  border-left: 4px solid #38bdf8;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 16px rgba(56, 189, 248, 0.2);
+}
+
+.cardflow-toast-icon {
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardflow-toast-msg {
+  flex: 1;
+  line-height: 1.45;
+}
