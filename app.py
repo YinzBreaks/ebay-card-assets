@@ -1565,6 +1565,52 @@ def swap_card_images(sku: str):
     return {"status": "success", "card": target}
 
 
+@app.post("/api/upload-batch")
+async def upload_batch_endpoint(
+    files: List[UploadFile] = File(...),
+    grader: Optional[str] = Form("PSA"),
+    grade: Optional[str] = Form("10")
+):
+    """Batch upload endpoint accepting multiple slab images, auto-pairing fronts/backs and deduplicating."""
+    if not files:
+        raise HTTPException(status_code=400, detail="No files uploaded.")
+
+    results = []
+    front_regex = re.compile(r'[-_\s](?:front|f|1|recto|obverse)\.[^.]+$', re.I)
+    back_regex = re.compile(r'[-_\s](?:back|b|2|verso|rear|reverse)\.[^.]+$', re.I)
+    cert_regex = re.compile(r'(?:PSA[-_]?)?(\d{7,10})', re.I)
+
+    i = 0
+    while i < len(files):
+        f1 = files[i]
+        f2 = files[i + 1] if i + 1 < len(files) else None
+
+        is_pair = False
+        if f2:
+            m1 = cert_regex.search(f1.filename or "")
+            m2 = cert_regex.search(f2.filename or "")
+            if m1 and m2 and m1.group(1) == m2.group(1):
+                is_pair = True
+            elif front_regex.search(f1.filename or "") or back_regex.search(f2.filename or ""):
+                is_pair = True
+            elif len(files) % 2 == 0:
+                is_pair = True
+
+        if is_pair and f2:
+            front_f, back_f = f1, f2
+            if back_regex.search(f1.filename or "") or front_regex.search(f2.filename or ""):
+                front_f, back_f = f2, f1
+            res = await upload_card(front=front_f, back=back_f, grader=grader, grade=grade)
+            results.append(res.get("card"))
+            i += 2
+        else:
+            res = await upload_card(file=f1, grader=grader, grade=grade)
+            results.append(res.get("card"))
+            i += 1
+
+    return {"status": "success", "cards": results, "count": len(results)}
+
+
 @app.post("/api/challenge")
 @app.post("/challenge")
 def challenge_comp(req: ChallengeRequest):
