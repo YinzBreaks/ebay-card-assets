@@ -99,6 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const applyChallengeBtn = document.getElementById("applyChallengeBtn");
   const modalApproveBtn = document.getElementById("modalApproveBtn");
   const quickChips = document.querySelectorAll(".quick-chips .chip");
+  let modalInitialListPrice = "0.00";
+  let userEditedListPriceManually = false;
 
   // Export Modal Elements
   const exportModal = document.getElementById("exportModal");
@@ -536,10 +538,52 @@ document.addEventListener("DOMContentLoaded", () => {
     return q;
   }
 
+  function renderValuationGrid(card) {
+    if (!modalJustificationText) return;
+    const baseCompVal = parseFloat(card.base_comp || (card.list_price / 1.15)).toFixed(2);
+    const listPriceVal = parseFloat(card.list_price || 0).toFixed(2);
+    const autoAcceptVal = parseFloat(card.auto_accept || (card.list_price * 0.85)).toFixed(2);
+    const minFloorVal = parseFloat(card.min_offer || (card.list_price * 0.75)).toFixed(2);
+    const optQuery = optimizeSearchQuery(card);
+
+    modalJustificationText.innerHTML = `
+      <div style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin-bottom: 8px;">
+        ${card.justification || 'Market comps verified from recent historical sales and PSA population.'}
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 6px;">
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Base Comp Median</span>
+          <strong style="font-size: 13px; color: #fff; font-family: var(--font-mono);">$${baseCompVal}</strong>
+        </div>
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Target BIN (List)</span>
+          <strong style="font-size: 13px; color: var(--psa-gold); font-family: var(--font-mono);">$${listPriceVal}</strong>
+        </div>
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Auto-Accept (Offers)</span>
+          <strong style="font-size: 13px; color: #4ade80; font-family: var(--font-mono);">$${autoAcceptVal}</strong>
+        </div>
+        <div>
+          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Hard Stop Floor</span>
+          <strong style="font-size: 13px; color: #f87171; font-family: var(--font-mono);">$${minFloorVal}</strong>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 10px; color: var(--text-muted);">Optimized Search Query:</span>
+        <code style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #38bdf8;">${optQuery}</code>
+        <button type="button" class="btn btn-secondary btn-xs" style="font-size: 10px; padding: 2px 6px;" onclick="if (navigator.clipboard) { navigator.clipboard.writeText('${optQuery.replace(/'/g, "\\'")}'); showToast('Search query copied!'); }">Copy Query</button>
+      </div>
+    `;
+  }
+
   function openChallengeModal(card) {
     currentCard = card;
     currentCardSku = card.sku;
     challengeModal.classList.add("open");
+
+    if (modalCardTitle) {
+      modalCardTitle.textContent = card.title || "Graded Card Details";
+    }
 
     modalSkuCode.textContent = card.sku;
     modalCertCode.textContent = `Cert #${card.cert_number || 'N/A'} • ${card.grader || 'PSA'} ${card.grade || '10'}`;
@@ -619,40 +663,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modalMinOffer.value = parseFloat(card.min_offer || 0).toFixed(2);
     challengeFeedback.value = "";
 
-    // Rich Valuation Logic & Justification Grid
-    const baseCompVal = parseFloat(card.base_comp || (card.list_price / 1.15)).toFixed(2);
-    const listPriceVal = parseFloat(card.list_price || 0).toFixed(2);
-    const autoAcceptVal = parseFloat(card.auto_accept || (card.list_price * 0.85)).toFixed(2);
-    const minFloorVal = parseFloat(card.min_offer || (card.list_price * 0.75)).toFixed(2);
+    modalInitialListPrice = modalListPrice.value;
+    userEditedListPriceManually = false;
 
-    modalJustificationText.innerHTML = `
-      <div style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin-bottom: 8px;">
-        ${card.justification || 'Market comps verified from recent historical sales and PSA population.'}
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 6px;">
-        <div>
-          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Base Comp Median</span>
-          <strong style="font-size: 13px; color: #fff; font-family: var(--font-mono);">$${baseCompVal}</strong>
-        </div>
-        <div>
-          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Target BIN (List)</span>
-          <strong style="font-size: 13px; color: var(--psa-gold); font-family: var(--font-mono);">$${listPriceVal}</strong>
-        </div>
-        <div>
-          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Auto-Accept (Offers)</span>
-          <strong style="font-size: 13px; color: #4ade80; font-family: var(--font-mono);">$${autoAcceptVal}</strong>
-        </div>
-        <div>
-          <span style="font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase;">Hard Stop Floor</span>
-          <strong style="font-size: 13px; color: #f87171; font-family: var(--font-mono);">$${minFloorVal}</strong>
-        </div>
-      </div>
-      <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-wrap: wrap;">
-        <span style="font-size: 10px; color: var(--text-muted);">Optimized Search Query:</span>
-        <code style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #38bdf8;">${optQuery}</code>
-        <button type="button" class="btn btn-secondary btn-xs" style="font-size: 10px; padding: 2px 6px;" onclick="if (navigator.clipboard) { navigator.clipboard.writeText('${optQuery.replace(/'/g, "\\'")}'); showToast('Search query copied!'); }">Copy Query</button>
-      </div>
-    `;
+    renderValuationGrid(card);
 
     // Populate comps table with clickable links
     modalCompsBody.innerHTML = "";
@@ -852,25 +866,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Modal Price Calculation
   modalListPrice.addEventListener("input", () => {
+    userEditedListPriceManually = true;
     const val = parseFloat(modalListPrice.value) || 0;
     modalAutoAccept.value = (val * 0.85).toFixed(2);
     modalMinOffer.value = (val * 0.75).toFixed(2);
   });
 
+  // Dynamic Base Comp adjustment listener
+  const editBaseCompInput = document.getElementById("modalEditBaseComp");
+  if (editBaseCompInput) {
+    editBaseCompInput.addEventListener("input", () => {
+      const b = parseFloat(editBaseCompInput.value);
+      if (!isNaN(b) && b > 0) {
+        const listP = Math.round(b * 1.15 * 100) / 100;
+        const autoP = Math.round(listP * 0.85 * 100) / 100;
+        const minP = Math.round(listP * 0.75 * 100) / 100;
+        modalListPrice.value = listP.toFixed(2);
+        modalAutoAccept.value = autoP.toFixed(2);
+        modalMinOffer.value = minP.toFixed(2);
+        userEditedListPriceManually = true;
+      }
+    });
+  }
+
+  // Dynamic Title editing syncs header immediately
+  const editTitleInput = document.getElementById("modalEditTitle");
+  if (editTitleInput) {
+    editTitleInput.addEventListener("input", () => {
+      if (modalCardTitle) {
+        modalCardTitle.textContent = editTitleInput.value.trim() || currentCard?.title || "Graded Card Details";
+      }
+    });
+  }
+
   // Apply Challenge
   applyChallengeBtn.addEventListener("click", async () => {
     if (!currentCard) return;
     const feedback = challengeFeedback.value.trim();
-    const mList = parseFloat(modalListPrice.value) || null;
-    const mAuto = parseFloat(modalAutoAccept.value) || null;
-    const mMin = parseFloat(modalMinOffer.value) || null;
+    const editBaseCompInputEl = document.getElementById("modalEditBaseComp");
+    const editBaseComp = parseFloat(editBaseCompInputEl?.value) || null;
+
+    // Only send manual_list_price if user actually edited the List Price input manually!
+    const currentListVal = parseFloat(modalListPrice.value) || 0;
+    const isManualListPrice = userEditedListPriceManually && (currentListVal.toFixed(2) !== modalInitialListPrice);
+    const mList = isManualListPrice ? currentListVal : null;
+    const mAuto = isManualListPrice ? (parseFloat(modalAutoAccept.value) || null) : null;
+    const mMin = isManualListPrice ? (parseFloat(modalMinOffer.value) || null) : null;
 
     const editTitle = document.getElementById("modalEditTitle")?.value.trim();
     const editPlayer = document.getElementById("modalEditPlayer")?.value.trim();
     const editSet = document.getElementById("modalEditSet")?.value.trim();
     const editCardNum = document.getElementById("modalEditCardNum")?.value.trim();
     const editCert = document.getElementById("modalEditCert")?.value.trim();
-    const editBaseComp = parseFloat(document.getElementById("modalEditBaseComp")?.value) || null;
 
     if (editTitle) currentCard.title = editTitle;
     if (editPlayer) currentCard.player = editPlayer;
@@ -878,6 +925,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (editCardNum) currentCard.card_number = editCardNum;
     if (editCert) currentCard.cert_number = editCert;
     if (editBaseComp) currentCard.base_comp = editBaseComp;
+
+    const origBtnHtml = applyChallengeBtn.innerHTML;
+    applyChallengeBtn.disabled = true;
+    applyChallengeBtn.innerHTML = `<span>Recalculating...</span>`;
 
     try {
       const res = await fetch("/api/challenge", {
@@ -898,26 +949,41 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       });
       const data = await res.json();
-      if (data.status === "success") {
+      if (data.status === "success" && data.card) {
         currentCard.list_price = data.card.list_price;
         currentCard.auto_accept = data.card.auto_accept;
         currentCard.min_offer = data.card.min_offer;
+        currentCard.base_comp = data.card.base_comp;
         currentCard.justification = data.card.justification;
         currentCard.status = "CHALLENGED";
         if (data.card.title) currentCard.title = data.card.title;
         if (data.card.player) currentCard.player = data.card.player;
 
-        modalCardTitle.textContent = currentCard.title;
-        modalJustificationText.textContent = currentCard.justification;
+        modalInitialListPrice = currentCard.list_price.toFixed(2);
+        userEditedListPriceManually = false;
+
+        if (modalCardTitle) modalCardTitle.textContent = currentCard.title;
         modalListPrice.value = currentCard.list_price.toFixed(2);
         modalAutoAccept.value = currentCard.auto_accept.toFixed(2);
         modalMinOffer.value = currentCard.min_offer.toFixed(2);
+        if (editBaseCompInputEl && currentCard.base_comp) {
+          editBaseCompInputEl.value = parseFloat(currentCard.base_comp).toFixed(2);
+        }
 
+        renderValuationGrid(currentCard);
+
+        showToast(`Pricing calibrated: List $${currentCard.list_price.toFixed(2)} | Auto-Accept $${currentCard.auto_accept.toFixed(2)}`, "success");
         renderTable();
         updateKPIs();
+      } else {
+        showToast("Challenge failed: " + (data.detail || "Server error"), "error");
       }
     } catch (err) {
       console.error("Challenge error:", err);
+      showToast("Error communicating with challenge engine", "error");
+    } finally {
+      applyChallengeBtn.disabled = false;
+      applyChallengeBtn.innerHTML = origBtnHtml;
     }
   });
 

@@ -1631,33 +1631,98 @@ def challenge_comp(req: ChallengeRequest):
     if req.card_number: target["card_number"] = req.card_number.strip()
     if req.cert_number: target["cert_number"] = req.cert_number.strip()
     if req.parallel: target["parallel"] = req.parallel.strip()
+
+    # Determine baseline comp
+    current_base = target.get("base_comp")
+    if current_base is None or current_base <= 0:
+        current_base = round(target.get("list_price", 100.0) / 1.15, 2)
+
+    # 1. Base comp override from input
     if req.base_comp is not None and req.base_comp > 0:
-        target["base_comp"] = round(float(req.base_comp), 2)
+        current_base = round(float(req.base_comp), 2)
+        target["base_comp"] = current_base
 
-    # Apply manual overrides or calculate intelligent adjustments based on feedback
-    if req.manual_list_price is not None and req.manual_list_price > 0:
-        target["list_price"] = round(float(req.manual_list_price), 2)
-        target["auto_accept"] = req.manual_auto_accept if req.manual_auto_accept else round(target["list_price"] * 0.85, 2)
-        target["min_offer"] = req.manual_min_offer if req.manual_min_offer else round(target["list_price"] * 0.75, 2)
-    elif req.feedback:
-        # Heuristic adjustment from feedback
-        fb = req.feedback.lower()
+    fb = (req.feedback or "").strip()
+    fb_lower = fb.lower()
+
+    if fb:
         multiplier = 1.0
-        if "rare" in fb or "1/1" in fb or "/25" in fb or "pink" in fb or "case hit" in fb:
-            multiplier = 1.20
-        elif "too low" in fb or "higher" in fb or "bump" in fb:
-            multiplier = 1.12
-        elif "too high" in fb or "lower" in fb or "drop" in fb:
-            multiplier = 0.88
+        applied_rules = []
 
-        target["list_price"] = round(target["list_price"] * multiplier, 2)
-        target["auto_accept"] = round(target["list_price"] * 0.85, 2)
-        target["min_offer"] = round(target["list_price"] * 0.75, 2)
+        # (a) Extract explicit percentages (+15%, +10%, -10%, etc.)
+        pct_matches = re.findall(r'([+-]?\s*\d+(?:\.\d+)?)\s*%', fb)
+        if pct_matches:
+            net_pct = 0.0
+            for pm in pct_matches:
+                try:
+                    val = float(pm.replace(" ", ""))
+                    net_pct += val
+                except ValueError:
+                    pass
+            multiplier *= (1.0 + (net_pct / 100.0))
+            sign = "+" if net_pct >= 0 else ""
+            applied_rules.append(f"{sign}{net_pct:.1f}% percentage adjustment")
 
-    challenge_note = f" [CHALLENGED: '{req.feedback}']" if req.feedback else " [MANUAL PRICE OVERRIDE]"
-    target["justification"] = f"Adjusted valuation: ${target['list_price']:.2f}. Auto-Accept at ${target['auto_accept']:.2f}, Min Floor at ${target['min_offer']:.2f}.{challenge_note}"
+        # (b) Raw comp to PSA 10 gem premium
+        if "raw" in fb_lower and not pct_matches:
+            multiplier *= 1.40  # +40% standard PSA 10 premium over raw
+            applied_rules.append("+40% PSA 10 Gem premium over raw comp")
+
+        # (c) Explicit dollar comp (e.g., "comp is $95", "comp $120", "sale $150", "comp was 85")
+        dollar_match = re.search(r'(?:comp\s*(?:is|was|=|at)?\s*\$?|target\s*(?:is|was|=|at)?\s*\$?|sold\s*(?:for|at)?\s*\$?|\$\s*)(\d+(?:\.\d+)?)', fb_lower)
+        if dollar_match and not pct_matches:
+            try:
+                extracted_dollar = float(dollar_match.group(1))
+                if extracted_dollar > 0:
+                    current_base = extracted_dollar
+                    applied_rules.append(f"Base comp anchored to ${extracted_dollar:.2f}")
+            except ValueError:
+                pass
+
+        # (d) Directional cues if no numbers found
+        if not pct_matches and not dollar_match and "raw" not in fb_lower:
+            if any(w in fb_lower for w in ["rare", "1/1", "/25", "/10", "/5", "case hit", "super rare", "gold", "downton"]):
+                multiplier *= 1.25
+                applied_rules.append("+25% Scarcity parallel markup")
+            elif any(w in fb_lower for w in ["too low", "bump", "higher", "increase", "up"]):
+                multiplier *= 1.15
+                applied_rules.append("+15% Upward recalibration")
+            elif any(w in fb_lower for w in ["too high", "drop", "lower", "decrease", "down", "discount"]):
+                multiplier *= 0.85
+                applied_rules.append("-15% Downward recalibration")
+
+        new_base_comp = round(current_base * multiplier, 2)
+        new_list_price = round(new_base_comp * 1.15, 2)
+        new_auto_accept = round(new_list_price * 0.85, 2)
+        new_min_floor = round(new_list_price * 0.75, 2)
+
+        target["base_comp"] = new_base_comp
+        target["list_price"] = new_list_price
+        target["auto_accept"] = new_auto_accept
+        target["min_offer"] = new_min_floor
+
+        rule_str = ", ".join(applied_rules) if applied_rules else "Feedback calibration"
+        target["justification"] = (
+            f"Challenged & Recalibrated: {rule_str}. Base comp: ${new_base_comp:.2f}. "
+            f"Target BIN ${new_list_price:.2f} (115%), Auto-Accept ${new_auto_accept:.2f} (85%), Hard Floor ${new_min_floor:.2f} (75%). "
+            f"User note: \"{fb}\""
+        )
+    elif req.manual_list_price is not None and req.manual_list_price > 0:
+        target["list_price"] = round(float(req.manual_list_price), 2)
+        target["auto_accept"] = round(float(req.manual_auto_accept), 2) if req.manual_auto_accept else round(target["list_price"] * 0.85, 2)
+        target["min_offer"] = round(float(req.manual_min_offer), 2) if req.manual_min_offer else round(target["list_price"] * 0.75, 2)
+        target["base_comp"] = round(float(req.base_comp), 2) if (req.base_comp and req.base_comp > 0) else round(target["list_price"] / 1.15, 2)
+        target["justification"] = f"Manual override: Target BIN ${target['list_price']:.2f}, Auto-Accept ${target['auto_accept']:.2f}, Hard Floor ${target['min_offer']:.2f} (Base comp: ${target['base_comp']:.2f})."
+    elif req.base_comp is not None and req.base_comp > 0:
+        new_base = round(float(req.base_comp), 2)
+        new_list = round(new_base * 1.15, 2)
+        target["base_comp"] = new_base
+        target["list_price"] = new_list
+        target["auto_accept"] = round(new_list * 0.85, 2)
+        target["min_offer"] = round(new_list * 0.75, 2)
+        target["justification"] = f"Base comp calibrated to ${new_base:.2f}. Target BIN ${new_list:.2f} (115%), Auto-Accept ${target['auto_accept']:.2f} (85%), Hard Floor ${target['min_offer']:.2f} (75%)."
+
     target["status"] = "CHALLENGED"
-
     save_cards(cards)
     return {"status": "success", "card": target}
 
