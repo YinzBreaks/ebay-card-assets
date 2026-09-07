@@ -626,6 +626,16 @@ body {
   background: var(--bg-card-hover);
 }
 
+@keyframes rowPulseGlow {
+  0% { background: rgba(245, 158, 11, 0.35); }
+  50% { background: rgba(245, 158, 11, 0.15); }
+  100% { background: transparent; }
+}
+
+.card-grid-table tbody tr.row-just-added {
+  animation: rowPulseGlow 3s ease-out;
+}
+
 /* Row Items */
 .slab-thumb-wrap {
   width: 52px;

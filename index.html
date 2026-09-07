@@ -102,7 +102,10 @@
               <span class="badge-tag" id="batchCountBadge">0 SLABS QUEUED</span>
               <span class="batch-detail" id="batchDetailText">Ready for bulk ingestion</span>
             </div>
-            <button class="btn btn-sm btn-secondary" id="clearBatchBtn" type="button">Clear Batch</button>
+            <div class="batch-actions" style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-sm btn-primary" id="batchProcessNowBtn" type="button">⚡ Process & Comp Now</button>
+              <button class="btn btn-sm btn-secondary" id="clearBatchBtn" type="button">Clear</button>
+            </div>
           </div>
 
           <div class="upload-progress-wrap" id="uploadProgressWrap" style="display: none;">

@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const batchCountBadge = document.getElementById("batchCountBadge");
   const batchDetailText = document.getElementById("batchDetailText");
   const clearBatchBtn = document.getElementById("clearBatchBtn");
+  const batchProcessNowBtn = document.getElementById("batchProcessNowBtn");
   const uploadProgressWrap = document.getElementById("uploadProgressWrap");
   const uploadProgressBar = document.getElementById("uploadProgressBar");
   const uploadProgressText = document.getElementById("uploadProgressText");
@@ -180,6 +181,10 @@ document.addEventListener("DOMContentLoaded", () => {
     filtered.forEach(card => {
       const tr = document.createElement("tr");
       tr.dataset.sku = card.sku;
+      if (card._justAdded) {
+        tr.classList.add("row-just-added");
+        setTimeout(() => { card._justAdded = false; }, 4000);
+      }
 
       const isChecked = selectedSkus.has(card.sku);
       const gradeStr = String(card.grade || "10");
@@ -699,6 +704,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if (batchProcessNowBtn) {
+    batchProcessNowBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      processUploadBtn.click();
+    });
+  }
+
   function handleFilesSelected(filesList) {
     if (!filesList || filesList.length === 0) return;
     const files = Array.from(filesList);
@@ -858,6 +870,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await res.json();
         if (data.status === "success") {
+          data.card._justAdded = true;
           cards.unshift(data.card);
           renderTable();
           updateKPIs();
@@ -889,8 +902,13 @@ document.addEventListener("DOMContentLoaded", () => {
       processUploadBtn.innerHTML = "<span>Process & Comp</span>";
       if (successCount === 1 && lastAddedCard) {
         openChallengeModal(lastAddedCard);
+      } else if (successCount > 1) {
+        const pendingPill = document.querySelector(".filter-pills .pill[data-filter='COMPED']");
+        if (pendingPill) pendingPill.click();
+        const tableCard = document.querySelector(".table-card");
+        if (tableCard) tableCard.scrollIntoView({ behavior: "smooth" });
       }
-    }, 2000);
+    }, 500);
   });
 
   // --- Export Workflow ---
