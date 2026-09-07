@@ -321,9 +321,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (gradeStr.includes("9")) gradeBadgeClass = "badge-psa-9";
       if (String(card.grader || "").toUpperCase().includes("BGS")) gradeBadgeClass = "badge-bgs";
 
-      const frontImg = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
+      const frontImg = card.front_thumb || ((card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
         ? card.front_url
-        : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`;
+        : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`);
 
       tr.innerHTML = `
         <td><input type="checkbox" class="row-checkbox" ${isChecked ? "checked" : ""}></td>
@@ -455,12 +455,12 @@ document.addEventListener("DOMContentLoaded", () => {
     modalSkuCode.textContent = card.sku;
     modalCertCode.textContent = `Cert #${card.cert_number || 'N/A'} • ${card.grader || 'PSA'} Grade ${card.grade || '10'}`;
 
-    const frontSrc = (card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
+    const frontSrc = card.front_thumb || ((card.front_url && !card.front_url.endsWith(`/${card.sku}.jpg`))
       ? card.front_url
-      : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`;
+      : `/assets/9_6_28_upload/${card.sku}-FRONT.jpg`);
     const backSrc = (card.back_url && !card.back_url.endsWith(`/${card.sku}.jpg`))
       ? card.back_url
-      : `/assets/9_6_28_upload/${card.sku}-BACK.jpg`;
+      : (card.front_thumb || `/assets/9_6_28_upload/${card.sku}-BACK.jpg`);
 
     modalFrontImg.src = frontSrc;
     modalBackImg.src = backSrc;

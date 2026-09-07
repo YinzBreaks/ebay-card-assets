@@ -5,6 +5,8 @@ import json
 import time
 import shutil
 import uuid
+import io
+import base64
 import numpy as np
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
@@ -682,64 +684,79 @@ async def upload_card(
     base_price: Optional[float] = Form(None)
 ):
     upload_batch_dir = os.path.join(ASSETS_DIR, "9_6_28_upload")
-    os.makedirs(upload_batch_dir, exist_ok=True)
+    try:
+        os.makedirs(upload_batch_dir, exist_ok=True)
+        t_file = os.path.join(upload_batch_dir, ".test_w")
+        with open(t_file, "w") as tf:
+            tf.write("1")
+        os.remove(t_file)
+    except (OSError, PermissionError):
+        upload_batch_dir = "/tmp/assets/9_6_28_upload"
+        try:
+            os.makedirs(upload_batch_dir, exist_ok=True)
+        except OSError:
+            pass
 
     cert_extracted = None
-    front_filename = None
-    back_filename = None
+    front_pil = None
+    back_pil = None
 
     # Scenario A: Dual-shot image provided in `file`
     if file:
         file_bytes = await file.read()
-        nparr = np.frombuffer(file_bytes, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        if img is None:
+        if cv2 is not None:
+            try:
+                nparr = np.frombuffer(file_bytes, np.uint8)
+                cv_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                if cv_img is not None:
+                    cert_extracted = extract_cert_from_cv_image(cv_img)
+            except Exception:
+                pass
+
+        try:
+            pil_img = Image.open(io.BytesIO(file_bytes)).convert("RGB")
+        except Exception:
             raise HTTPException(status_code=400, detail="Invalid image file format")
 
-        h, w = img.shape[:2]
-        cert_extracted = extract_cert_from_cv_image(img)
-
+        w, h = pil_img.size
         # Detect dual-shot canvas split
         if w >= h * 0.9:
-            # Landscape or square side-by-side split: Left is Front, Right is Back
             half = w // 2
-            front_img = img[:, :half]
-            back_img = img[:, half:]
+            front_pil = pil_img.crop((0, 0, half, h))
+            back_pil = pil_img.crop((half, 0, w, h))
         elif h > w * 1.15:
-            # Stacked vertical split: Top is Front, Bottom is Back
             half = h // 2
-            front_img = img[:half, :]
-            back_img = img[half:, :]
+            front_pil = pil_img.crop((0, 0, w, half))
+            back_pil = pil_img.crop((0, half, w, h))
         else:
-            # Single slab photo
-            front_img = img
-            back_img = img
-
-        temp_id = str(uuid.uuid4())[:8]
-        front_filename = f"CARD-{temp_id}-FRONT.jpg"
-        back_filename = f"CARD-{temp_id}-BACK.jpg"
-        cv2.imwrite(os.path.join(upload_batch_dir, front_filename), front_img)
-        cv2.imwrite(os.path.join(upload_batch_dir, back_filename), back_img)
+            front_pil = pil_img
+            back_pil = pil_img
 
     # Scenario B: Separate Front and Back files
     elif front:
         front_bytes = await front.read()
-        nparr = np.frombuffer(front_bytes, np.uint8)
-        front_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        cert_extracted = extract_cert_from_cv_image(front_img)
+        if cv2 is not None:
+            try:
+                nparr = np.frombuffer(front_bytes, np.uint8)
+                cv_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                if cv_img is not None:
+                    cert_extracted = extract_cert_from_cv_image(cv_img)
+            except Exception:
+                pass
 
-        temp_id = str(uuid.uuid4())[:8]
-        front_filename = f"CARD-{temp_id}-FRONT.jpg"
-        cv2.imwrite(os.path.join(upload_batch_dir, front_filename), front_img)
+        try:
+            front_pil = Image.open(io.BytesIO(front_bytes)).convert("RGB")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid front image format")
 
         if back:
             back_bytes = await back.read()
-            back_arr = np.frombuffer(back_bytes, np.uint8)
-            back_img = cv2.imdecode(back_arr, cv2.IMREAD_COLOR)
-            back_filename = f"CARD-{temp_id}-BACK.jpg"
-            cv2.imwrite(os.path.join(upload_batch_dir, back_filename), back_img)
+            try:
+                back_pil = Image.open(io.BytesIO(back_bytes)).convert("RGB")
+            except Exception:
+                back_pil = front_pil
         else:
-            back_filename = front_filename
+            back_pil = front_pil
     else:
         raise HTTPException(status_code=400, detail="Please provide either a dual-shot image or front/back card images.")
 
@@ -756,14 +773,31 @@ async def upload_card(
     team_slug = re.sub(r'[^A-Za-z0-9]', '', safe_team.split()[-1]).upper()[:4]
     sku = f"{team_slug}-{player_slug}-{safe_card_num}-{safe_grader}{safe_grade}"
 
-    # Rename saved images to match Custom Label exactly: {SKU}-FRONT.jpg and {SKU}-BACK.jpg
     final_front = f"{sku}-FRONT.jpg"
     final_back = f"{sku}-BACK.jpg"
-    shutil.move(os.path.join(upload_batch_dir, front_filename), os.path.join(upload_batch_dir, final_front))
-    if front_filename != back_filename and os.path.exists(os.path.join(upload_batch_dir, back_filename)):
-        shutil.move(os.path.join(upload_batch_dir, back_filename), os.path.join(upload_batch_dir, final_back))
-    else:
-        final_back = final_front
+
+    # Save images safely to upload batch directory
+    front_path = os.path.join(upload_batch_dir, final_front)
+    back_path = os.path.join(upload_batch_dir, final_back)
+    try:
+        front_pil.save(front_path, format="JPEG", quality=90)
+    except Exception:
+        pass
+    try:
+        back_pil.save(back_path, format="JPEG", quality=90)
+    except Exception:
+        pass
+
+    # Generate lightweight base64 thumbnail for instant zero-latency UI rendering
+    front_thumb_data = ""
+    try:
+        thumb_buf = io.BytesIO()
+        thumb_img = front_pil.copy()
+        thumb_img.thumbnail((120, 160))
+        thumb_img.save(thumb_buf, format="JPEG", quality=80)
+        front_thumb_data = "data:image/jpeg;base64," + base64.b64encode(thumb_buf.getvalue()).decode()
+    except Exception:
+        pass
 
     generated_title = card_title or f"2024-25 {card_set or 'Panini Select'} {safe_player} {parallel or 'Prizm'} {safe_grader} {safe_grade} GEM MINT #{safe_card_num}"
 
@@ -817,6 +851,7 @@ async def upload_card(
         "base_comp": base,
         "justification": justification,
         "front_url": f"/assets/9_6_28_upload/{final_front}",
+        "front_thumb": front_thumb_data,
         "back_url": f"/assets/9_6_28_upload/{final_back}",
         "front_cdn": front_cdn_url,
         "back_cdn": back_cdn_url,
@@ -1298,6 +1333,15 @@ def get_js():
         if os.path.exists(p):
             return FileResponse(p, media_type="application/javascript")
     raise HTTPException(status_code=404)
+
+
+@app.get("/assets/{filepath:path}")
+def serve_asset(filepath: str):
+    for base in [ASSETS_DIR, "/tmp/assets", "/tmp"]:
+        candidate = os.path.join(base, filepath)
+        if os.path.exists(candidate):
+            return FileResponse(candidate)
+    raise HTTPException(status_code=404, detail="Asset not found")
 
 
 # Static mounts for local development & fallback
